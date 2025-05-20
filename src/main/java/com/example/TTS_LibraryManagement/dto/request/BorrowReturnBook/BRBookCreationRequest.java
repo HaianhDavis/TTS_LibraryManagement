@@ -12,7 +12,6 @@ import java.sql.Timestamp;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ToString
 public class BRBookCreationRequest {
-    Long userId;
     Long bookId;
     Timestamp returnAt;
 }

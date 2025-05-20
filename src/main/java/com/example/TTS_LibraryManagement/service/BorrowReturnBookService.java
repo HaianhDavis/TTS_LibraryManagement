@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface BorrowReturnBookService {
     List<BorrowReturnBookResponse> getBorrowReturnBooksByUserId(Long userId);
-    BorrowReturnBookResponse getBorrowReturnBookByUserIdAndBookId(Long userId, Long bookId);
+    BorrowReturnBookResponse getBorrowReturnBookById(Long id);
     BorrowReturnBookResponse createBorrowReturnBook(Long userId, BRBookCreationRequest request);
     BorrowReturnBookResponse updateBorrowReturnBook(Long id, BRBookUpdateRequest request);
     void deleteBorrowReturnBook(Long id);

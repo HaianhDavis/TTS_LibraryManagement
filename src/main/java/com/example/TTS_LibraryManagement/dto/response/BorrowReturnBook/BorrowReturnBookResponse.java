@@ -21,10 +21,12 @@ public class BorrowReturnBookResponse {
     Timestamp borrowedAt;
     Timestamp returnAt;
     Timestamp returnedAt;
+    String status;
     Timestamp createdAt;
     String createdBy;
     Timestamp updatedAt;
     String updatedBy;
     Timestamp deletedAt;
     String deletedBy;
+
 }

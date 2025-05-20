@@ -38,47 +38,62 @@ public class BorrowReturnBookServiceImpl implements BorrowReturnBookService {
 
     BookRepo bookRepo;
 
+    @Transactional
     public List<BorrowReturnBookResponse> getBorrowReturnBooksByUserId(Long userId) {
         List<BorrowReturnBook> brs = borrowReturnBookRepo.findByUserId(userId);
-        if(brs.isEmpty()){
+        if (brs.isEmpty()) {
             throw new AppException(ErrorCode.BORROW_RETURN_BOOK_NOT_FOUND);
         }
         return brs.stream().map(borrowReturnBook -> {
             BorrowReturnBookResponse response = borrowReturnBookMapper.toBorrowReturnBookResponse(borrowReturnBook);
-            User user = userRepo.findUserByUserIdAndIsDeletedFalse(userId).orElseThrow();
-            Book book = bookRepo.findBookByUserIdAndIsDeletedFalse(borrowReturnBook.getBook().getId()).orElseThrow();
+            User user = userRepo.findUserByBRIdAndIsDeletedFalse(borrowReturnBook.getId()).orElseThrow();
+            Book book = bookRepo.findBookByBRIdAndIsDeletedFalse(borrowReturnBook.getId()).orElseThrow();
             response.setUser(borrowReturnBookMapper.toBRUserResponse(user));
             response.setBook(borrowReturnBookMapper.toBRBookResponse(book));
+            if(borrowReturnBook.getStatus() == 0) {
+                response.setStatus("Borrowed");
+            } else {
+                response.setStatus("Returned");
+            }
             return response;
         }).collect(Collectors.toList());
     }
 
-    public BorrowReturnBookResponse getBorrowReturnBookByUserIdAndBookId(Long userId, Long bookId) {
-        BorrowReturnBook borrowReturnBook = borrowReturnBookRepo.findByUserIdAndBookId(userId, bookId)
+    @Transactional
+    public BorrowReturnBookResponse getBorrowReturnBookById(Long id) {
+        BorrowReturnBook borrowReturnBook = borrowReturnBookRepo.findByBRId(id)
                 .orElseThrow(() -> new AppException(ErrorCode.BORROW_RETURN_BOOK_NOT_FOUND));
         BorrowReturnBookResponse borrowReturnBookResponse = borrowReturnBookMapper.toBorrowReturnBookResponse(borrowReturnBook);
-        borrowReturnBookResponse.setUser(borrowReturnBookMapper.toBRUserResponse(userRepo.findUserByUserIdAndIsDeletedFalse(userId).orElseThrow()));
-        borrowReturnBookResponse.setBook(borrowReturnBookMapper.toBRBookResponse(bookRepo.findBookByUserIdAndIsDeletedFalse(bookId).orElseThrow()));
+        borrowReturnBookResponse.setUser(borrowReturnBookMapper.toBRUserResponse(userRepo.findUserByBRIdAndIsDeletedFalse(borrowReturnBook.getId()).orElseThrow()));
+        borrowReturnBookResponse.setBook(borrowReturnBookMapper.toBRBookResponse(bookRepo.findBookByBRIdAndIsDeletedFalse(borrowReturnBook.getId()).orElseThrow()));
+        if (borrowReturnBook.getStatus() == 0) {
+            borrowReturnBookResponse.setStatus("Borrowed");
+        } else {
+            borrowReturnBookResponse.setStatus("Returned");
+        }
         return borrowReturnBookResponse;
     }
 
     @Transactional
     public BorrowReturnBookResponse createBorrowReturnBook(Long userId, BRBookCreationRequest request) {
-        Timestamp now = Timestamp.valueOf(LocalDateTime.now());
-        if (request.getReturnAt().before(now)) {
-            throw new AppException(ErrorCode.RETURN_DATE_NOT_VALID);
-        }
+        User user = userRepo.findUserByIdAndIsDeletedFalse(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         List<BorrowReturnBook> borrowReturnBooks = borrowReturnBookRepo.findByUserId(userId);
-        for(BorrowReturnBook borrowReturnBook : borrowReturnBooks) {
+        for (BorrowReturnBook borrowReturnBook : borrowReturnBooks) {
             if (borrowReturnBook.getBook().getId().equals(request.getBookId())) {
                 throw new AppException(ErrorCode.BOOK_ALREADY_BORROWED);
             }
         }
-        User user = userRepo.findUserByIdAndIsDeletedFalse(request.getUserId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
         Book book = bookRepo.findBookByIdAndIsDeletedFalse(request.getBookId()).orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_FOUND));
         if (book.getBorrowedQuantity() >= book.getQuantity()) {
             throw new AppException(ErrorCode.BOOK_NOT_AVAILABLE);
         }
+
+        Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+        if (request.getReturnAt().before(now)) {
+            throw new AppException(ErrorCode.RETURN_DATE_NOT_VALID);
+        }
+
         BorrowReturnBook borrowReturnBook = borrowReturnBookMapper.toBorrowReturnBookCreate(request);
         borrowReturnBook.setUser(user);
         borrowReturnBook.setBook(book);
@@ -89,31 +104,71 @@ public class BorrowReturnBookServiceImpl implements BorrowReturnBookService {
         BorrowReturnBookResponse response = borrowReturnBookMapper.toBorrowReturnBookResponse(borrowReturnBook);
         response.setUser(borrowReturnBookMapper.toBRUserResponse(user));
         response.setBook(borrowReturnBookMapper.toBRBookResponse(book));
+        response.setStatus("Borrowed");
         return response;
     }
 
     @Transactional
     public BorrowReturnBookResponse updateBorrowReturnBook(Long id, BRBookUpdateRequest request) {
-        BorrowReturnBook borrowReturnBook = borrowReturnBookRepo.findById(id).orElseThrow(() -> new AppException(ErrorCode.BORROW_RETURN_BOOK_NOT_FOUND));
-        BRBookUpdateRequest currentDTO = borrowReturnBookMapper.toBorrowReturnBookUpdateRequest(borrowReturnBook);
-        User user = userRepo.findUserByIdAndIsDeletedFalse(request.getUserId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        Book book = bookRepo.findBookByIdAndIsDeletedFalse(request.getBookId()).orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_FOUND));
-        if (currentDTO.equals(request) && borrowReturnBook.getUser().equals(user) && borrowReturnBook.getBook().equals(book)) {
+        BorrowReturnBook borrowReturnBook = borrowReturnBookRepo.findByBRId(id).orElseThrow(() -> new AppException(ErrorCode.BORROW_RETURN_BOOK_NOT_FOUND));
+        Book oldBook = borrowReturnBook.getBook();
+        Book newBook = bookRepo.findBookByIdAndIsDeletedFalse(request.getBookId()).orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_FOUND));
+
+        if (!oldBook.getId().equals(newBook.getId()) && request.getStatus() != 1) {
+            List<BorrowReturnBook> borrowReturnBooks = borrowReturnBookRepo.findByUserId(borrowReturnBook.getUser().getId());
+            for (BorrowReturnBook borrowReturnBook1 : borrowReturnBooks) {
+                if (!borrowReturnBook1.getId().equals(id) && borrowReturnBook1.getBook().getId().equals(request.getBookId()) && borrowReturnBook1.getStatus() == 0) {
+                    throw new AppException(ErrorCode.BOOK_ALREADY_BORROWED);
+                }
+            }
+        }
+        if (borrowReturnBook.getBorrowedAt().after(request.getReturnAt())) {
+            throw new AppException(ErrorCode.RETURN_DATE_NOT_VALID);
+        }
+        if (request.getStatus() != 0 && request.getStatus() != 1) {
+            throw new AppException(ErrorCode.BORROW_RETURN_BOOK_STATUS_NOT_VALID);
+        }
+        if (request.getReturnAt().equals(borrowReturnBook.getReturnAt()) && newBook.getId().equals(oldBook.getId()) && request.getStatus() == borrowReturnBook.getStatus()) {
             throw new AppException(ErrorCode.BORROW_RETURN_BOOK_NOT_CHANGED);
         }
+        if (!oldBook.getId().equals(newBook.getId())) {
+            if (borrowReturnBook.getStatus() == 0) {
+                oldBook.setBorrowedQuantity(oldBook.getBorrowedQuantity() - 1);
+            }
+
+            if (request.getStatus() == 0) {
+                newBook.setBorrowedQuantity(newBook.getBorrowedQuantity() + 1);
+            }
+        }
+        else if (borrowReturnBook.getStatus() == 0 && request.getStatus() == 1) {
+            newBook.setBorrowedQuantity(newBook.getBorrowedQuantity() - 1);
+        }
+        else if (borrowReturnBook.getStatus() == 1 && request.getStatus() == 0) {
+            newBook.setBorrowedQuantity(newBook.getBorrowedQuantity() + 1);
+        }
         borrowReturnBookMapper.toBorrowReturnBookUpdate(borrowReturnBook, request);
-        return borrowReturnBookMapper.toBorrowReturnBookResponse(borrowReturnBook);
+        borrowReturnBook.setBook(newBook);
+        borrowReturnBookRepo.save(borrowReturnBook);
+        BorrowReturnBookResponse response = borrowReturnBookMapper.toBorrowReturnBookResponse(borrowReturnBook);
+        response.setUser(borrowReturnBookMapper.toBRUserResponse(borrowReturnBook.getUser()));
+        response.setBook(borrowReturnBookMapper.toBRBookResponse(newBook));
+        if (request.getStatus() == 1) {
+            response.setStatus("Returned");
+        } else {
+            response.setStatus("Borrowed");
+        }
+        return response;
     }
 
     public void deleteBorrowReturnBook(Long id) {
-        BorrowReturnBook borrowReturnBook = borrowReturnBookRepo.findById(id).orElseThrow(() -> new AppException(ErrorCode.BORROW_RETURN_BOOK_NOT_FOUND));
+        BorrowReturnBook borrowReturnBook = borrowReturnBookRepo.findByBRId(id).orElseThrow(() -> new AppException(ErrorCode.BORROW_RETURN_BOOK_NOT_FOUND));
         borrowReturnBook.setIsDeleted(1);
         borrowReturnBook.setDeletedAt(Timestamp.valueOf(LocalDateTime.now()));
         borrowReturnBookRepo.save(borrowReturnBook);
     }
 
     public void restoreBorrowReturnBook(Long id) {
-        BorrowReturnBook borrowReturnBook = borrowReturnBookRepo.findById(id).orElseThrow(() -> new AppException(ErrorCode.BORROW_RETURN_BOOK_NOT_FOUND));
+        BorrowReturnBook borrowReturnBook = borrowReturnBookRepo.findByBRId(id).orElseThrow(() -> new AppException(ErrorCode.BORROW_RETURN_BOOK_NOT_FOUND));
         if (borrowReturnBook.getIsDeleted() == 0) {
             throw new AppException(ErrorCode.BORROW_RETURN_BOOK_NOT_DELETED);
         }

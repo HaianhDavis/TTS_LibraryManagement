@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ToString
 public class BRBookUpdateRequest {
-    Long userId;
     Long bookId;
     Timestamp returnAt;
+    int status;
 }

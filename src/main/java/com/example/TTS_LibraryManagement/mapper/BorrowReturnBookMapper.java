@@ -25,9 +25,8 @@ public interface BorrowReturnBookMapper {
     @Mapping(target = "book", ignore = true)
     BorrowReturnBookResponse toBorrowReturnBookResponse(BorrowReturnBook borrowReturnBook);
 
+    @Mapping(target = "status", source = "status") // Thêm dòng này
     void toBorrowReturnBookUpdate(@MappingTarget BorrowReturnBook borrowReturnBook, BRBookUpdateRequest request);
-
-    BRBookUpdateRequest toBorrowReturnBookUpdateRequest(BorrowReturnBook borrowReturnBook);
 
     BRUserResponse toBRUserResponse(User user);
 

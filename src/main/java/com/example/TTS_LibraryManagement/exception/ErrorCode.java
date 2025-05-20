@@ -50,7 +50,7 @@ public enum ErrorCode {
     RETURN_DATE_NOT_VALID("RETURN DATE NOT VALID","Return date must be greater than borrow date!"),
     BOOK_NOT_AVAILABLE("BOOK NOT AVAILABLE","Book not available!"),
     BOOK_ALREADY_BORROWED("BOOK ALREADY BORROWED","You already borrowed this book!"),
-
+    BORROW_RETURN_BOOK_STATUS_NOT_VALID("BORROW RETURN BOOK STATUS NOT VALID","Borrow return book status must be 0 or 1!"),
     ;
     private String code;
     private String message;

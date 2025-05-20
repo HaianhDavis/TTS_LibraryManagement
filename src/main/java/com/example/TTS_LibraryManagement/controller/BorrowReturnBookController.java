@@ -21,11 +21,11 @@ import java.util.List;
 public class BorrowReturnBookController {
     BorrowReturnBookService borrowReturnBookService;
 
-    @PostMapping("/create")
-    ApiResponse<BorrowReturnBookResponse> createBR(@RequestBody BRBookCreationRequest request) {
+    @PostMapping("/create/{userId}")
+    ApiResponse<BorrowReturnBookResponse> createBR(@PathVariable Long userId, @RequestBody BRBookCreationRequest request) {
         ApiResponse<BorrowReturnBookResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully created Borrow Return Book");
-        apiResponse.setResult(borrowReturnBookService.createBorrowReturnBook(request));
+        apiResponse.setResult(borrowReturnBookService.createBorrowReturnBook(userId,request));
         return apiResponse;
     }
 
@@ -37,11 +37,11 @@ public class BorrowReturnBookController {
         return apiResponse;
     }
 
-    @GetMapping("/detail/{userId}&{bookId}")
-    ApiResponse<BorrowReturnBookResponse> getBRByUserIdAndBookId(@PathVariable Long userId, @PathVariable Long bookId) {
+    @GetMapping("/detail/{id}")
+    ApiResponse<BorrowReturnBookResponse> getBRById(@PathVariable Long id) {
         ApiResponse<BorrowReturnBookResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved Borrow Return Book");
-        apiResponse.setResult(borrowReturnBookService.getBorrowReturnBookByUserIdAndBookId(userId, bookId));
+        apiResponse.setResult(borrowReturnBookService.getBorrowReturnBookById(id));
         return apiResponse;
     }
 
