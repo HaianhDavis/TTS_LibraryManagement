@@ -42,4 +42,6 @@ public interface UserRepo extends JpaRepository<User,Long> , JpaSpecificationExe
 
     @Query(value = "select u from User u join Comment c on u.id = c.user.id join Post p on p.id = c.post.id where c.id = ?1 and u.isDeleted = 0 and c.isDeleted = 0 and p.isDeleted = 0")
     Optional<User> findUserByCommentIdAndIsDeletedFalse(Long id);
+
+    Optional<User> findByUsername(String username);
 }

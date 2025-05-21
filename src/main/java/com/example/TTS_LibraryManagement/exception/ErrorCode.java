@@ -58,6 +58,10 @@ public enum ErrorCode {
     COMMENT_NOT_DELETED("COMMENT NOT DELETED","Comment has not deleted!"),
     COMMENT_NOT_CHANGED("COMMENT NOT CHANGED","Comment has not changed!"),
     POST_LIKE_EXISTED("POST LIKE EXISTED","Post like existed!"),
+    UNAUTHENTICATED("UNAUTHENTICATED","User is not authenticated!"),
+    INVALID_INPUT("INVALID INPUT", "Invalid input data"),
+
+
     ;
     private String code;
     private String message;
