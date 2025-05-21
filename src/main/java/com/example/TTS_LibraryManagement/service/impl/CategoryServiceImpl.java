@@ -3,10 +3,8 @@ package com.example.TTS_LibraryManagement.service.impl;
 import com.example.TTS_LibraryManagement.dto.request.Category.CategoryCreationRequest;
 import com.example.TTS_LibraryManagement.dto.request.Category.CategoryUpdateRequest;
 import com.example.TTS_LibraryManagement.dto.response.Category.CategoryResponse;
-import com.example.TTS_LibraryManagement.dto.response.Role.RoleResponse;
+import com.example.TTS_LibraryManagement.dto.response.Dashboard.DashboardBookResponse;
 import com.example.TTS_LibraryManagement.entity.Category;
-import com.example.TTS_LibraryManagement.entity.Role;
-import com.example.TTS_LibraryManagement.entity.User;
 import com.example.TTS_LibraryManagement.exception.AppException;
 import com.example.TTS_LibraryManagement.exception.ErrorCode;
 import com.example.TTS_LibraryManagement.mapper.CategoryMapper;
@@ -24,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -109,5 +108,16 @@ public class CategoryServiceImpl implements CategoryService {
             throw new AppException(ErrorCode.ROLE_NOT_FOUND);
         }
         return categories.map(categoryMapper::toCategoryResponse);
+    }
+
+    public List<DashboardBookResponse> getStatisticsByCategory() {
+        List<Object[]> categoryStats = categoryRepo.getBookStatsByCategory();
+        return categoryStats.stream().map(objects -> {
+            DashboardBookResponse dashboardBookResponse = new DashboardBookResponse();
+            dashboardBookResponse.setCategoryId(Long.valueOf(objects[0].toString()));
+            dashboardBookResponse.setCategoryName(objects[1].toString());
+            dashboardBookResponse.setTotalBooks(Integer.parseInt(objects[2].toString()));
+            return dashboardBookResponse;
+        }).collect(Collectors.toList());
     }
 }

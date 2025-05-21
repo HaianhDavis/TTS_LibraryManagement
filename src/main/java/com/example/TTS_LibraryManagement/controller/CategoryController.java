@@ -3,6 +3,7 @@ package com.example.TTS_LibraryManagement.controller;
 import com.example.TTS_LibraryManagement.dto.request.Category.CategoryCreationRequest;
 import com.example.TTS_LibraryManagement.dto.request.Category.CategoryUpdateRequest;
 import com.example.TTS_LibraryManagement.dto.response.ApiResponse;
+import com.example.TTS_LibraryManagement.dto.response.Dashboard.DashboardBookResponse;
 import com.example.TTS_LibraryManagement.dto.response.Role.RoleResponse;
 import com.example.TTS_LibraryManagement.dto.response.Category.CategoryResponse;
 import com.example.TTS_LibraryManagement.service.CategoryService;
@@ -75,6 +76,14 @@ public class CategoryController {
         ApiResponse<RoleResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully restored Category with id " + id);
         categoryService.restoreCategory(id);
+        return apiResponse;
+    }
+
+    @GetMapping("/statistics")
+    ApiResponse<List<DashboardBookResponse>> getStatistics() {
+        ApiResponse<List<DashboardBookResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Successfully created comment!");
+        apiResponse.setResult(categoryService.getStatisticsByCategory());
         return apiResponse;
     }
 }

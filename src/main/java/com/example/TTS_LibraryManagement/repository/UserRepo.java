@@ -31,9 +31,15 @@ public interface UserRepo extends JpaRepository<User,Long> , JpaSpecificationExe
     @Query("SELECT u FROM User u WHERE u.id IN :ids AND u.isDeleted = 0")
     List<User> findAllByIdInAndIsDeletedFalse(Set<Long> ids);
 
-    @Query(value = "select u from User u join BorrowReturnBook br on u.id = br.user.id join Book b on b.id = br.book.id where br.id = ?1 and u.isDeleted = 0 and b.isDeleted = 0 order by br.status DESC")
+    @Query(value = "select u from User u join BorrowReturnBook br on u.id = br.user.id join Book b on b.id = br.book.id where br.id = ?1 and u.isDeleted = 0 and b.isDeleted = 0 and br.isDeleted = 0 order by br.status DESC")
     Optional<User> findUserByBRIdAndIsDeletedFalse(Long id);
 
     @Query(value = "select count(u)>0 from User u where u.id = ?1 and u.isDeleted = 0")
     boolean existsById(Long id);
+
+    @Query(value = "select u from User u join Post p on u.id = p.user.id join Book b on b.id = p.book.id where p.id = ?1 and u.isDeleted = 0 and b.isDeleted = 0 and p.isDeleted = 0")
+    Optional<User> findUserByPostIdAndIsDeletedFalse(Long id);
+
+    @Query(value = "select u from User u join Comment c on u.id = c.user.id join Post p on p.id = c.post.id where c.id = ?1 and u.isDeleted = 0 and c.isDeleted = 0 and p.isDeleted = 0")
+    Optional<User> findUserByCommentIdAndIsDeletedFalse(Long id);
 }

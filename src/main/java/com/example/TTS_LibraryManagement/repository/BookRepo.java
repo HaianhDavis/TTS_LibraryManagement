@@ -21,11 +21,13 @@ public interface BookRepo extends JpaRepository<Book, Long>, JpaSpecificationExe
     @Query(value = "select b from Book b where b.isDeleted = 0")
     List<Book> findAllByIsDeletedFalse();
 
-    @Query(value = "select b from User u join BorrowReturnBook br on u.id = br.user.id join Book b on b.id = br.book.id where br.id = ?1 and u.isDeleted = 0 and b.isDeleted = 0 order by br.status DESC")
+    @Query(value = "select b from User u join BorrowReturnBook br on u.id = br.user.id join Book b on b.id = br.book.id where br.id = ?1 and u.isDeleted = 0 and b.isDeleted = 0 and br.isDeleted = 0 order by br.status DESC")
     Optional<Book> findBookByBRIdAndIsDeletedFalse(Long id);
 
     @Query(value = "select count(b)>0 from Book b where b.id = ?1 and b.isDeleted = 0")
     boolean existsById(Long id);
 
+    @Query(value = "select b from User u join Post p on u.id = p.user.id join Book b on b.id = p.book.id where p.id = ?1 and u.isDeleted = 0 and b.isDeleted = 0 and p.isDeleted = 0")
+    Optional<Book> findBookByPostIdAndIsDeletedFalse(Long id);
 
 }

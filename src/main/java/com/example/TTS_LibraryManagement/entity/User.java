@@ -41,4 +41,13 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     Set<BorrowReturnBook> borrowRecords;
+
+    @OneToMany(mappedBy = "user")
+    Set<Post> posts;
+
+    @OneToMany(mappedBy = "user")
+    Set<PostLike> postLikes;
+
+    @OneToMany(mappedBy = "user")
+    Set<Comment> comments;
 }

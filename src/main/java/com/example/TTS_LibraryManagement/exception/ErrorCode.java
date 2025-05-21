@@ -51,6 +51,13 @@ public enum ErrorCode {
     BOOK_NOT_AVAILABLE("BOOK NOT AVAILABLE","Book not available!"),
     BOOK_ALREADY_BORROWED("BOOK ALREADY BORROWED","You already borrowed this book!"),
     BORROW_RETURN_BOOK_STATUS_NOT_VALID("BORROW RETURN BOOK STATUS NOT VALID","Borrow return book status must be 0 or 1!"),
+    POST_NOT_FOUND("POST NOT FOUND","Post not found!"),
+    POST_NOT_DELETED("POST NOT DELETED","Post has not deleted!"),
+    POST_NOT_CHANGED("POST NOT CHANGED","Post has not changed!"),
+    COMMENT_NOT_FOUND("COMMENT NOT FOUND","Comment not found!"),
+    COMMENT_NOT_DELETED("COMMENT NOT DELETED","Comment has not deleted!"),
+    COMMENT_NOT_CHANGED("COMMENT NOT CHANGED","Comment has not changed!"),
+    POST_LIKE_EXISTED("POST LIKE EXISTED","Post like existed!"),
     ;
     private String code;
     private String message;

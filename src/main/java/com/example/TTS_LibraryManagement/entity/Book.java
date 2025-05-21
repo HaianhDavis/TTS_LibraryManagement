@@ -48,4 +48,7 @@ public class Book {
 
     @OneToMany(mappedBy = "book")
     Set<BorrowReturnBook> borrowRecords;
+
+    @OneToMany(mappedBy = "book")
+    Set<Post> posts;
 }

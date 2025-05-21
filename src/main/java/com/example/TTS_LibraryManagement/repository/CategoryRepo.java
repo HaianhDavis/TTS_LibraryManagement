@@ -1,5 +1,6 @@
 package com.example.TTS_LibraryManagement.repository;
 
+import com.example.TTS_LibraryManagement.dto.response.Dashboard.DashboardBookResponse;
 import com.example.TTS_LibraryManagement.entity.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -33,4 +35,12 @@ public interface CategoryRepo extends JpaRepository<Category, Long> {
 
     @Query(value = "SELECT c.id FROM Category c where c.isDeleted = 0")
     List<Long> findAllIdByIsDeletedFalse();
+
+    @Query(value = "SELECT c.id AS categoryId, c.category_name as categoryName, COUNT(b.id) AS totalBooks " +
+            "FROM categories c " +
+            "LEFT JOIN book_categories bc ON c.id = bc.category_id " +
+            "LEFT JOIN books b ON bc.book_id = b.id " +
+            "WHERE c.is_deleted = 0 AND b.is_deleted = 0 " +
+            "GROUP BY c.id, c.category_name", nativeQuery = true)
+    List<Object[]> getBookStatsByCategory();
 }

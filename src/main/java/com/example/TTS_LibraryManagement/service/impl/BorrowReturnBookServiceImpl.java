@@ -168,7 +168,7 @@ public class BorrowReturnBookServiceImpl implements BorrowReturnBookService {
     }
 
     public void restoreBorrowReturnBook(Long id) {
-        BorrowReturnBook borrowReturnBook = borrowReturnBookRepo.findByBRId(id).orElseThrow(() -> new AppException(ErrorCode.BORROW_RETURN_BOOK_NOT_FOUND));
+        BorrowReturnBook borrowReturnBook = borrowReturnBookRepo.findById(id).orElseThrow(() -> new AppException(ErrorCode.BORROW_RETURN_BOOK_NOT_FOUND));
         if (borrowReturnBook.getIsDeleted() == 0) {
             throw new AppException(ErrorCode.BORROW_RETURN_BOOK_NOT_DELETED);
         }
