@@ -1,10 +1,12 @@
 package com.example.TTS_LibraryManagement.dto.response.User;
 
+import com.example.TTS_LibraryManagement.entity.Role;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.Set;
 
 
 @Data
@@ -15,7 +17,6 @@ import java.time.LocalDate;
 public class UserResponse {
     Long id;
     String username;
-    String password;
     String fullname;
     String phoneNumber;
     String identityNumber;

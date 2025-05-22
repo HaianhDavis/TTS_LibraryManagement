@@ -32,6 +32,4 @@ public class Permission {
     int isDeleted;
     Timestamp deletedAt;
     String deletedBy;
-    @ManyToMany(mappedBy = "permissions")
-    private Set<Role> roles;
 }

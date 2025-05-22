@@ -25,4 +25,12 @@ public interface RoleRepo extends JpaRepository<Role,Long> {
     @Query(value = "select r from Role r where r.id = ?1 and r.isDeleted = 0")
     Optional<Role> findRoleByIdAndIsDeletedFalse(Long id);
 
+    @Query(value = "select r from Role r where r.roleGroupCode = ?1 and r.isDeleted = 0")
+    Optional<Role> findByRoleGroupCodeAndIsDeletedFalse(String roleGroupCode);
+
+    @Query(value = "select r.role_group_code from roles r" +
+            " left join user_roles ur on ur.role_id = r.id" +
+            " left join users u on ur.user_id = u.id " +
+            " where u.id = ?1 and r.is_deleted = 0 and u.is_deleted = 0", nativeQuery = true)
+    List<String> getAllRoleOfUser(Long userId);
 }

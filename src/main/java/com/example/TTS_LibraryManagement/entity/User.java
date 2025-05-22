@@ -13,6 +13,7 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 @Data
+@Builder
 @NoArgsConstructor      // Constructor không tham số
 @AllArgsConstructor     // Constructor có tất cả tham số
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -35,19 +36,4 @@ public class User {
     int isDeleted;
     Timestamp deletedAt;
     String deletedBy;
-
-    @ManyToMany(mappedBy = "users")
-    private Set<Role> roles;
-
-    @OneToMany(mappedBy = "user")
-    Set<BorrowReturnBook> borrowRecords;
-
-    @OneToMany(mappedBy = "user")
-    Set<Post> posts;
-
-    @OneToMany(mappedBy = "user")
-    Set<PostLike> postLikes;
-
-    @OneToMany(mappedBy = "user")
-    Set<Comment> comments;
 }

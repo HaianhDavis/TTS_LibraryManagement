@@ -5,7 +5,6 @@ import com.example.TTS_LibraryManagement.dto.request.Permission.PermissionSearch
 import com.example.TTS_LibraryManagement.dto.request.Permission.PermissionUpdateRequest;
 import com.example.TTS_LibraryManagement.dto.response.Permission.PermissionResponse;
 import com.example.TTS_LibraryManagement.entity.Permission;
-import com.example.TTS_LibraryManagement.entity.User;
 import com.example.TTS_LibraryManagement.exception.AppException;
 import com.example.TTS_LibraryManagement.exception.ErrorCode;
 import com.example.TTS_LibraryManagement.mapper.PermissionMapper;
@@ -17,11 +16,15 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -38,12 +41,14 @@ public class PermissionServiceImpl implements PermissionService {
     PermissionMapper permissionMapper;
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public PermissionResponse createPermission(PermissionCreationRequest request){
         if(permissionRepo.existsByFunctionCode(request.getFunctionCode())){
             throw new AppException(ErrorCode.PERMISSION_EXISTED);
         }
         Permission permission = permissionMapper.toPermissionCreate(request);
         permission.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        permission.setCreatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
         return permissionMapper.toPermissionResponse(permissionRepo.save(permission));
     }
 
