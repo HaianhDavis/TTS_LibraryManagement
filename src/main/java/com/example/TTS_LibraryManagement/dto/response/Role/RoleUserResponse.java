@@ -11,11 +11,5 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoleUserResponse {
-    Long id;
-    String fullname;
-    String phoneNumber;
-    String identityNumber;
-    Integer age;
-    LocalDate birthday;
-    String address;
+    String username;
 }

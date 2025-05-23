@@ -14,5 +14,4 @@ public class PermissionUpdateRequest {
     String functionCode;
     String functionName;
     String description;
-    List<Long> roleIds;
 }

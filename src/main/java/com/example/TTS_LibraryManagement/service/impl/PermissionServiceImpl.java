@@ -41,7 +41,7 @@ public class PermissionServiceImpl implements PermissionService {
     PermissionMapper permissionMapper;
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public PermissionResponse createPermission(PermissionCreationRequest request){
         if(permissionRepo.existsByFunctionCode(request.getFunctionCode())){
             throw new AppException(ErrorCode.PERMISSION_EXISTED);
@@ -53,6 +53,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public PermissionResponse updatePermission(Long id, PermissionUpdateRequest request){
         Permission permission = permissionRepo
                 .findPermissionByIdAndIsDeletedFalse(id).orElseThrow(() -> new AppException(ErrorCode.PERMISSION_NOT_FOUND));
@@ -62,6 +63,7 @@ public class PermissionServiceImpl implements PermissionService {
         }
         permissionMapper.toPermissionUpdate(permission,request);
         permission.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
+        permission.setUpdatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
         return permissionMapper.toPermissionResponse(permissionRepo.save(permission));
     }
 
@@ -72,6 +74,7 @@ public class PermissionServiceImpl implements PermissionService {
                 .orElseThrow(() -> new AppException(ErrorCode.PERMISSION_NOT_FOUND));
         permission.setIsDeleted(1);
         permission.setDeletedAt(Timestamp.valueOf(LocalDateTime.now()));
+        permission.setDeletedBy(SecurityContextHolder.getContext().getAuthentication().getName());
         permissionRepo.save(permission);
     }
 

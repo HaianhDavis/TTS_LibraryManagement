@@ -44,4 +44,5 @@ public interface UserRepo extends JpaRepository<User,Long> , JpaSpecificationExe
     Optional<User> findUserByCommentIdAndIsDeletedFalse(Long id);
 
     Optional<User> findByUsername(String username);
+
 }

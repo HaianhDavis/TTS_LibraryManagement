@@ -23,14 +23,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import jakarta.persistence.criteria.Predicate;
 
@@ -48,6 +45,7 @@ public class UserServiceImpl implements UserService {
     PasswordEncoder passwordEncoder;
 
     @Transactional
+    @PreAuthorize("hasAuthority('ROLE_CREATE_USER')")
     public UserResponse createUser(UserCreationRequest request) {
         if (userRepo.existsByUsername(request.getUsername()))
             throw new AppException(ErrorCode.USERNAME_EXISTED);
@@ -63,6 +61,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
+    @PreAuthorize("hasAuthority('ROLE_UPDATE_USER')")
     public UserResponse updateUser(Long userId, UserUpdateRequest request) {
         User user = userRepo
                 .findUserByIdAndIsDeletedFalse(userId)
@@ -77,6 +76,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
+    @PreAuthorize("hasAuthority('ROLE_DELETE_USER')")
     public void deleteUser(Long userId) {
         User user = userRepo
                 .findUserByIdAndIsDeletedFalse(userId)
@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAuthority('ROLE_VIEW_USER')")
     public List<UserResponse> getUsers() {
         log.info("in method getUsers");
         List<User> users = userRepo.findUsersByIsDeletedFalse();
@@ -112,6 +112,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
+    @PreAuthorize("hasAuthority('ROLE_VIEW_USER_DETAIL')")
     public UserResponse getUserById(Long id) {
         return userMapper.toUserResponse(userRepo
                 .findUserByIdAndIsDeletedFalse(id)

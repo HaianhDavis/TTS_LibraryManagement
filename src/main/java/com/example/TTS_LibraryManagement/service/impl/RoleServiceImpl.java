@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -111,6 +112,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Transactional
+//    @PreAuthorize("hasAuthority('ROLE_UPDATE_ROLE_GROUP')")
     public RoleResponse updateRole(Long id, RoleUpdateRequest request) {
         Role role = roleRepo.findRoleByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));

@@ -33,4 +33,10 @@ public interface RoleRepo extends JpaRepository<Role,Long> {
             " left join users u on ur.user_id = u.id " +
             " where u.id = ?1 and r.is_deleted = 0 and u.is_deleted = 0", nativeQuery = true)
     List<String> getAllRoleOfUser(Long userId);
+
+    @Query(value = "select p.function_code from permissions p" +
+                " left join role_permissions rp on rp.permission_id = p.id" +
+                " left join roles r on rp.role_id = r.id" +
+                " where r.role_group_code = ?1 and r.is_deleted = 0 and p.is_deleted = 0", nativeQuery = true)
+    List<String> getAllPermissionOfRole(String roleCode);
 }

@@ -12,15 +12,9 @@ import java.util.Set;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoleUpdateRequest {
-    @NotBlank(message = "NOT_BLANK")
     String roleGroupCode;
-
-    @NotBlank(message = "NOT_BLANK")
     String roleGroupName;
-
-    @NotBlank(message = "NOT_BLANK")
     String description;
-
     Set<Long> userIds;
     Set<Long> permissionIds;
 }
