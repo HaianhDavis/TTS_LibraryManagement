@@ -1,85 +1,96 @@
-//package com.example.TTS_LibraryManagement.config;
-//
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.core.io.Resource;
-//import org.springframework.core.io.ResourceLoader;
-//import org.springframework.security.access.expression.SecurityExpressionRoot;
-//import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
-//import org.springframework.security.core.Authentication;
-//import org.springframework.security.core.context.SecurityContextHolder;
-//import org.springframework.stereotype.Component;
-//
-//import jakarta.servlet.http.HttpServletRequest;
-//import java.io.IOException;
-//import java.util.HashMap;
-//import java.util.Map;
-//import java.util.Properties;
-//
-//@Component
-//public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
-//
-//    private final ResourceLoader resourceLoader;
-//    private Map<String, String> roleMappings;
-//
-//    @Autowired
-//    public CustomMethodSecurityExpressionRoot(ResourceLoader resourceLoader) {
-//        super((Authentication) null); // Không cần Authentication tại thời điểm khởi tạo
-//        this.resourceLoader = resourceLoader;
-//        this.roleMappings = new HashMap<>();
-//        loadRoleMappings(); // Tải role từ file properties khi khởi tạo
-//    }
-//
-//    // Phương thức tải role từ file role.properties
-//    private void loadRoleMappings() {
-//        try {
-//            Resource resource = resourceLoader.getResource("role.properties");
-//            Properties properties = new Properties();
-//            properties.load(resource.getInputStream());
-//            properties.forEach((key, value) -> roleMappings.put((String) key, (String) value));
-//        } catch (IOException e) {
-//            throw new RuntimeException("Failed to load role.properties", e);
-//        }
-//    }
-//
-//    // Phương thức kiểm tra quyền dựa trên URI
-//    public boolean fileRole(HttpServletRequest request) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication == null || !authentication.isAuthenticated()) {
-//            return false;
-//        }
-//
-//        String uri = request.getRequestURI();
-//        String requiredRole = roleMappings.getOrDefault(uri, null);
-//        if (requiredRole == null) {
-//            return false; // Không tìm thấy role cho URI, từ chối truy cập
-//        }
-//
-//        return authentication.getAuthorities().stream()
-//                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(requiredRole));
-//    }
-//
-//    @Override
-//    public void setFilterObject(Object filterObject) {
-//        // Không cần triển khai nếu không sử dụng filter
-//    }
-//
-//    @Override
-//    public Object getFilterObject() {
-//        return null;
-//    }
-//
-//    @Override
-//    public void setReturnObject(Object returnObject) {
-//        // Không cần triển khai nếu không sử dụng return object
-//    }
-//
-//    @Override
-//    public Object getReturnObject() {
-//        return null;
-//    }
-//
-//    @Override
-//    public Object getThis() {
-//        return this;
-//    }
-//}
+package com.example.TTS_LibraryManagement.config;
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.expression.SecurityExpressionRoot;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.util.Properties;
+
+@Slf4j
+public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
+    private final Properties roleProperties;
+    private Object filterObject;
+    private Object returnObject;
+    private Object target;
+    @Setter
+    private HttpServletRequest request;
+
+    public CustomMethodSecurityExpressionRoot(Authentication authentication, Properties roleProperties) {
+        super(authentication);
+        this.roleProperties = roleProperties;
+    }
+
+    public boolean fileRole(HttpServletRequest httpServletRequest) {
+        HttpServletRequest request = httpServletRequest != null ? httpServletRequest : getCurrentHttpRequest();
+        if (request == null) {
+            log.error("HttpServletRequest is null");
+            return false;
+        }
+
+        String uri = request.getRequestURI(); // Ví dụ: /identity/api/v1/library/book
+        String contextPath = request.getContextPath(); // Ví dụ: /identity/api/v1/library
+        if (contextPath != null && uri.startsWith(contextPath)) {
+            uri = uri.substring(contextPath.length()); // Loại bỏ context-path, còn: /book
+        }
+        uri = uri.replaceAll("^/+", "").replaceAll("/+$", ""); // Loại bỏ / đầu và cuối, còn: book
+        uri = uri.replace("/", "."); // Thay / thành ., còn: book
+
+        // Thêm prefix để khớp với roles.properties
+        String normalizedUri = "api.v1.library." + uri; // Kết quả: api.v1.library.book
+
+        log.debug("Normalized URI: {}", normalizedUri);
+        String requiredPermission = roleProperties.getProperty(normalizedUri);
+        if (requiredPermission == null) {
+            log.warn("No permission found for URI: {}", normalizedUri);
+            return false;
+        }
+
+        boolean hasAuthority = hasAuthority(requiredPermission);
+        log.debug("Has authority [{}] for permission [{}]: {}", getAuthentication().getName(), requiredPermission, hasAuthority);
+        return hasAuthority;
+    }
+
+    private HttpServletRequest getCurrentHttpRequest() {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes instanceof ServletRequestAttributes) {
+            return ((ServletRequestAttributes) requestAttributes).getRequest();
+        }
+        return null;
+    }
+
+    @Override
+    public void setFilterObject(Object filterObject) {
+        this.filterObject = filterObject;
+    }
+
+    @Override
+    public Object getFilterObject() {
+        return filterObject;
+    }
+
+    @Override
+    public void setReturnObject(Object returnObject) {
+        this.returnObject = returnObject;
+    }
+
+    @Override
+    public Object getReturnObject() {
+        return returnObject;
+    }
+
+    @Override
+    public Object getThis() {
+        return target;
+    }
+
+
+    public void setThis(Object aThis) {
+        this.target = aThis;
+    }
+}

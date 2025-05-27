@@ -71,6 +71,8 @@ public class UserServiceImpl implements UserService {
             throw new AppException(ErrorCode.USER_NOT_CHANGED);
         }
         userMapper.toUserUpdate(user,request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
         user.setUpdatedAt(Timestamp.valueOf(LocalDateTime.now()));
         return userMapper.toUserResponse(userRepo.save(user));
     }

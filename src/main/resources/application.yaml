@@ -21,3 +21,13 @@ spring:
 
 jwt:
   signerKey: "GscuJW11GiHLuIhqbvA3lnnpF3q1X5q2WzgpS9eUJ+LNNoL3b31GqUoTNZCDndlS"
+
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    config:
+      level: DEBUG

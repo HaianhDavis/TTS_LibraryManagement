@@ -6,6 +6,7 @@ import com.example.TTS_LibraryManagement.dto.request.Book.BookUpdateRequest;
 import com.example.TTS_LibraryManagement.dto.response.ApiResponse;
 import com.example.TTS_LibraryManagement.dto.response.Book.BookResponse;
 import com.example.TTS_LibraryManagement.service.BookService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
@@ -34,7 +36,8 @@ public class BookController {
     }
 
     @GetMapping
-    ApiResponse<List<BookResponse>> getBooks() {
+    @PreAuthorize("fileRole(#httpServletRequest)")
+    ApiResponse<List<BookResponse>> getBooks(HttpServletRequest httpServletRequest) {
         ApiResponse<List<BookResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved all Books");
         apiResponse.setResult(bookService.getBooks());

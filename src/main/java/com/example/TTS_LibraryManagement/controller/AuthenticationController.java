@@ -2,6 +2,7 @@ package com.example.TTS_LibraryManagement.controller;
 
 import com.example.TTS_LibraryManagement.dto.request.AuthenticationRequest;
 import com.example.TTS_LibraryManagement.dto.request.IntrospectRequest;
+import com.example.TTS_LibraryManagement.dto.request.LogoutRequest;
 import com.example.TTS_LibraryManagement.dto.response.ApiResponse;
 import com.example.TTS_LibraryManagement.dto.response.AuthenticationResponse;
 import com.example.TTS_LibraryManagement.dto.response.IntrospectResponse;
@@ -39,6 +40,14 @@ public class AuthenticationController {
         ApiResponse<IntrospectResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully introspected");
         apiResponse.setResult(authenticationService.introspect(request));
+        return apiResponse;
+    }
+
+    @PostMapping("/logout")
+    ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
+        ApiResponse<Void> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Successfully logged out");
+        authenticationService.logout(request);
         return apiResponse;
     }
 }
