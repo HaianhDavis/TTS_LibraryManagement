@@ -12,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class CategoryController {
     CategoryService categoryService;
 
     @PostMapping("/create")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<CategoryResponse> createCategory(@RequestBody @Valid CategoryCreationRequest request) {
         ApiResponse<CategoryResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully created Category");
@@ -32,6 +34,7 @@ public class CategoryController {
     }
 
     @GetMapping
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<List<CategoryResponse>> getCategories() {
         ApiResponse<List<CategoryResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved categories");
@@ -40,6 +43,7 @@ public class CategoryController {
     }
 
     @GetMapping("/detail/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<CategoryResponse> getCategoryById(@PathVariable("id") Long CategoryId) {
         ApiResponse<CategoryResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved Category with ID " + CategoryId);
@@ -48,6 +52,7 @@ public class CategoryController {
     }
 
     @PutMapping("/update/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody CategoryUpdateRequest request) {
         ApiResponse<CategoryResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully updated Category");
@@ -56,6 +61,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<CategoryResponse> deleteCategory(@PathVariable Long id) {
         ApiResponse<CategoryResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully deleted Category with ID: " + id);
@@ -64,14 +70,16 @@ public class CategoryController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<Page<CategoryResponse>> searchCategory(@RequestParam(name = "pageNo") int pageNo, @RequestParam(name = "pageSize") int pageSize) {
         ApiResponse<Page<CategoryResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved categories");
-        apiResponse.setResult(categoryService.getCategoriesByPage(pageNo,pageSize));
+        apiResponse.setResult(categoryService.getCategoriesByPage(pageNo, pageSize));
         return apiResponse;
     }
 
     @PatchMapping("/restore/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<RoleResponse> restoreCategory(@PathVariable Long id) {
         ApiResponse<RoleResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully restored Category with id " + id);
@@ -80,6 +88,7 @@ public class CategoryController {
     }
 
     @GetMapping("/statistics")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<List<DashboardBookResponse>> getStatistics() {
         ApiResponse<List<DashboardBookResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully created comment!");

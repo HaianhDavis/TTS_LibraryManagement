@@ -1,96 +1,90 @@
 package com.example.TTS_LibraryManagement.config;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Objects;
 import java.util.Properties;
 
 @Slf4j
+@Getter
+@Setter
 public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
-    private final Properties roleProperties;
+    private Properties roleProperties;
     private Object filterObject;
     private Object returnObject;
     private Object target;
     @Setter
     private HttpServletRequest request;
 
-    public CustomMethodSecurityExpressionRoot(Authentication authentication, Properties roleProperties) {
+    public CustomMethodSecurityExpressionRoot(Authentication authentication) {
         super(authentication);
-        this.roleProperties = roleProperties;
+        loadRoleProperties();
+        log.info("Initializing CustomMethodSecurityExpressionRoot");
+    }
+
+    // Load role.properties file
+    private void loadRoleProperties() {
+        roleProperties = new Properties();
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("role.properties")) {
+            if (input != null) {
+                roleProperties.load(input);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Could not load role.properties file", e);
+        }
     }
 
     public boolean fileRole(HttpServletRequest httpServletRequest) {
-        HttpServletRequest request = httpServletRequest != null ? httpServletRequest : getCurrentHttpRequest();
-        if (request == null) {
-            log.error("HttpServletRequest is null");
+        log.info("Entering fileRole with HttpServletRequest: {}", httpServletRequest);
+        try {
+            if (Objects.isNull(httpServletRequest)) {
+                log.warn("HttpServletRequest is null");
+                return false;
+            }
+
+            String uri = httpServletRequest.getRequestURI();
+            String contextPath = httpServletRequest.getContextPath();
+            log.debug("Request URI: {}, Context Path: {}", uri, contextPath);
+
+            if (contextPath != null && !contextPath.isEmpty() && uri.startsWith(contextPath)) {
+                uri = uri.substring(contextPath.length());
+            }
+            uri = uri.replaceAll("^/+", "").replaceAll("/+$", "");
+            uri = uri.replace("/", ".");
+
+            String normalizedUri = "api.v1.library." + uri;
+            log.debug("Normalized URI: {}", normalizedUri);
+
+            String requiredPermission = roleProperties.getProperty(normalizedUri);
+            if (requiredPermission == null) {
+                log.warn("No permission found for URI: {}", normalizedUri);
+                return false;
+            }
+
+            log.debug("Required Permission: {}", requiredPermission);
+            boolean hasAuthority = hasAuthority(requiredPermission);
+            log.debug("Has authority [{}] for permission [{}]: {}",
+                    getAuthentication() != null ? getAuthentication().getName() : "null",
+                    requiredPermission, hasAuthority);
+            return hasAuthority;
+        } catch (Exception e) {
+            log.error("Error in fileRole for URI: {}",
+                    httpServletRequest != null ? httpServletRequest.getRequestURI() : "null", e);
             return false;
         }
-
-        String uri = request.getRequestURI(); // Ví dụ: /identity/api/v1/library/book
-        String contextPath = request.getContextPath(); // Ví dụ: /identity/api/v1/library
-        if (contextPath != null && uri.startsWith(contextPath)) {
-            uri = uri.substring(contextPath.length()); // Loại bỏ context-path, còn: /book
-        }
-        uri = uri.replaceAll("^/+", "").replaceAll("/+$", ""); // Loại bỏ / đầu và cuối, còn: book
-        uri = uri.replace("/", "."); // Thay / thành ., còn: book
-
-        // Thêm prefix để khớp với roles.properties
-        String normalizedUri = "api.v1.library." + uri; // Kết quả: api.v1.library.book
-
-        log.debug("Normalized URI: {}", normalizedUri);
-        String requiredPermission = roleProperties.getProperty(normalizedUri);
-        if (requiredPermission == null) {
-            log.warn("No permission found for URI: {}", normalizedUri);
-            return false;
-        }
-
-        boolean hasAuthority = hasAuthority(requiredPermission);
-        log.debug("Has authority [{}] for permission [{}]: {}", getAuthentication().getName(), requiredPermission, hasAuthority);
-        return hasAuthority;
     }
 
-    private HttpServletRequest getCurrentHttpRequest() {
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        if (requestAttributes instanceof ServletRequestAttributes) {
-            return ((ServletRequestAttributes) requestAttributes).getRequest();
-        }
-        return null;
-    }
-
-    @Override
-    public void setFilterObject(Object filterObject) {
-        this.filterObject = filterObject;
-    }
-
-    @Override
-    public Object getFilterObject() {
-        return filterObject;
-    }
-
-    @Override
-    public void setReturnObject(Object returnObject) {
-        this.returnObject = returnObject;
-    }
-
-    @Override
-    public Object getReturnObject() {
-        return returnObject;
-    }
 
     @Override
     public Object getThis() {
-        return target;
-    }
-
-
-    public void setThis(Object aThis) {
-        this.target = aThis;
+        return null;
     }
 }

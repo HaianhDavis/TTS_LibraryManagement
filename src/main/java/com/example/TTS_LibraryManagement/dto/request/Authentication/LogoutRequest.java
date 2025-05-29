@@ -1,4 +1,4 @@
-package com.example.TTS_LibraryManagement.dto.response;
+package com.example.TTS_LibraryManagement.dto.request.Authentication;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -9,8 +9,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ToString
-public class AuthenticationResponse {
-    String accessToken;
-    String refreshToken;
-    boolean authenticated;
+public class LogoutRequest {
+    String token;
 }

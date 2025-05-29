@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class CommentController {
     CommentService commentService;
 
     @PostMapping("/create/{userId}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<CommentResponse> createComment(@PathVariable Long userId, @RequestBody CommentCreationRequest request) {
         ApiResponse<CommentResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully created comment!");
@@ -30,6 +32,7 @@ public class CommentController {
     }
 
     @GetMapping
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<List<CommentResponse>> getComments() {
         ApiResponse<List<CommentResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved comments!");
@@ -38,6 +41,7 @@ public class CommentController {
     }
 
     @GetMapping("/detail/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<CommentResponse> getComment(@PathVariable Long id) {
         ApiResponse<CommentResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved comment!");
@@ -46,6 +50,7 @@ public class CommentController {
     }
 
     @PutMapping("/update/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<CommentResponse> updateComment(@PathVariable Long id, @RequestBody CommentUpdateRequest request) {
         ApiResponse<CommentResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully updated comment!");
@@ -54,6 +59,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<CommentResponse> deleteComment(@PathVariable Long id) {
         ApiResponse<CommentResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully deleted comment!");
@@ -62,6 +68,7 @@ public class CommentController {
     }
 
     @PatchMapping("/restore/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<CommentResponse> restoreComment(@PathVariable Long id) {
         ApiResponse<CommentResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully restored comment!");

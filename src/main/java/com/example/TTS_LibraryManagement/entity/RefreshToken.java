@@ -1,22 +1,21 @@
 package com.example.TTS_LibraryManagement.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
+import java.sql.Timestamp;
+
 @Entity
-@Table(name = "invalidated_tokens")
+@Table(name = "refresh_tokens")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ToString
-public class InvalidatedToken {
+public class RefreshToken {
     @Id
     String id;
-    Date expiredTime;
+    Timestamp expiredTime;
 }

@@ -1,5 +1,5 @@
 server:
-  port: 8093
+  port: 8094
   servlet:
     context-path: /identity/api/v1/library
 
@@ -21,8 +21,8 @@ spring:
 
 jwt:
   signerKey: "GscuJW11GiHLuIhqbvA3lnnpF3q1X5q2WzgpS9eUJ+LNNoL3b31GqUoTNZCDndlS"
-
-
+  valid-duration: 3600 #in seconds
+  refreshable-duration: 36000 #in seconds
 logging:
   level:
     org.springframework.security: DEBUG

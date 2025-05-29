@@ -12,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,14 +26,16 @@ public class PostController {
     PostService postService;
 
     @PostMapping("/create/{userId}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<PostResponse> createPost(@PathVariable Long userId, @RequestBody PostCreationRequest request) {
         ApiResponse<PostResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully created post!");
-        apiResponse.setResult(postService.createPost(userId,request));
+        apiResponse.setResult(postService.createPost(userId, request));
         return apiResponse;
     }
 
     @GetMapping
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<List<PostResponse>> getPosts() {
         ApiResponse<List<PostResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved posts!");
@@ -41,6 +44,7 @@ public class PostController {
     }
 
     @GetMapping("/detail/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<PostResponse> getPost(@PathVariable Long id) {
         ApiResponse<PostResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved post!");
@@ -49,6 +53,7 @@ public class PostController {
     }
 
     @PutMapping("/update/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<PostResponse> updatePost(@PathVariable Long id, @RequestBody PostUpdateRequest request) {
         ApiResponse<PostResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully updated post!");
@@ -57,6 +62,7 @@ public class PostController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<PostResponse> deletePost(@PathVariable Long id) {
         ApiResponse<PostResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully deleted post!");
@@ -65,6 +71,7 @@ public class PostController {
     }
 
     @PatchMapping("/restore/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<PostResponse> restorePost(@PathVariable Long id) {
         ApiResponse<PostResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully restored post!");
@@ -73,6 +80,7 @@ public class PostController {
     }
 
     @PostMapping("/like/{userId}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<PostLikeResponse> likePost(@PathVariable Long userId, @RequestBody LikeOrDislikeRequest request) {
         ApiResponse<PostLikeResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully liked post!");
@@ -81,6 +89,7 @@ public class PostController {
     }
 
     @GetMapping("/top-liked")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<List<DashboardPostResponse>> getTopLikedPosts() {
         ApiResponse<List<DashboardPostResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved top liked posts!");

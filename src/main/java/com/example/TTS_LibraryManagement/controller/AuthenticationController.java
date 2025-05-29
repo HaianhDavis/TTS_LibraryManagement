@@ -1,8 +1,9 @@
 package com.example.TTS_LibraryManagement.controller;
 
-import com.example.TTS_LibraryManagement.dto.request.AuthenticationRequest;
-import com.example.TTS_LibraryManagement.dto.request.IntrospectRequest;
-import com.example.TTS_LibraryManagement.dto.request.LogoutRequest;
+import com.example.TTS_LibraryManagement.dto.request.Authentication.AuthenticationRequest;
+import com.example.TTS_LibraryManagement.dto.request.Authentication.IntrospectRequest;
+import com.example.TTS_LibraryManagement.dto.request.Authentication.LogoutRequest;
+import com.example.TTS_LibraryManagement.dto.request.Authentication.RefreshRequest;
 import com.example.TTS_LibraryManagement.dto.response.ApiResponse;
 import com.example.TTS_LibraryManagement.dto.response.AuthenticationResponse;
 import com.example.TTS_LibraryManagement.dto.response.IntrospectResponse;
@@ -48,6 +49,14 @@ public class AuthenticationController {
         ApiResponse<Void> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully logged out");
         authenticationService.logout(request);
+        return apiResponse;
+    }
+
+    @PostMapping("/refresh")
+    ApiResponse<AuthenticationResponse> refresh(@RequestBody RefreshRequest request) throws ParseException, JOSEException {
+        ApiResponse<AuthenticationResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setMessage("Successfully refreshed token");
+        apiResponse.setResult(authenticationService.refreshToken(request));
         return apiResponse;
     }
 }

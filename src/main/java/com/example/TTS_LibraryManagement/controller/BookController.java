@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 @Slf4j
@@ -28,6 +29,7 @@ public class BookController {
     BookService bookService;
 
     @PostMapping("/create")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<BookResponse> createBook(@RequestBody BookCreationRequest request) {
         ApiResponse<BookResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully created Book");
@@ -45,6 +47,7 @@ public class BookController {
     }
 
     @GetMapping("/detail/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<BookResponse> getBookById(@PathVariable Long id) {
         ApiResponse<BookResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved Book with id " + id);
@@ -53,6 +56,7 @@ public class BookController {
     }
 
     @PutMapping("/update/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<BookResponse> updateBook(@PathVariable Long id, @RequestBody BookUpdateRequest request) {
         ApiResponse<BookResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully updated Book with id " + id);
@@ -61,6 +65,7 @@ public class BookController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<BookResponse> deleteBook(@PathVariable Long id) {
         ApiResponse<BookResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully deleted Book with id " + id);
@@ -69,6 +74,7 @@ public class BookController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<Page<BookResponse>> searchBooks(@RequestParam(name = "pageNo") int pageNo, @RequestParam(name = "pageSize") int pageSize, @RequestBody BookSearchRequest request) {
         ApiResponse<Page<BookResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved all Books");
@@ -77,6 +83,7 @@ public class BookController {
     }
 
     @PatchMapping("/restore/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<BookResponse> restoreBook(@PathVariable Long id) {
         ApiResponse<BookResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully restored Book with id " + id);
@@ -85,11 +92,13 @@ public class BookController {
     }
 
     @PostMapping("/import-excel")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<?> importBooksFromExcel(@RequestParam("file") MultipartFile file) {
         return bookService.importBooksFromExcel(file);
     }
 
     @GetMapping("/export-excel")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     public void exportBooksToExcel(HttpServletResponse response) {
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=books.xls");
         bookService.exportBooksToExcel(response);

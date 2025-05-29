@@ -45,7 +45,6 @@ public class UserServiceImpl implements UserService {
     PasswordEncoder passwordEncoder;
 
     @Transactional
-    @PreAuthorize("hasAuthority('ROLE_CREATE_USER')")
     public UserResponse createUser(UserCreationRequest request) {
         if (userRepo.existsByUsername(request.getUsername()))
             throw new AppException(ErrorCode.USERNAME_EXISTED);
@@ -61,7 +60,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    @PreAuthorize("hasAuthority('ROLE_UPDATE_USER')")
     public UserResponse updateUser(Long userId, UserUpdateRequest request) {
         User user = userRepo
                 .findUserByIdAndIsDeletedFalse(userId)
@@ -78,7 +76,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    @PreAuthorize("hasAuthority('ROLE_DELETE_USER')")
     public void deleteUser(Long userId) {
         User user = userRepo
                 .findUserByIdAndIsDeletedFalse(userId)
@@ -103,7 +100,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    @PreAuthorize("hasAuthority('ROLE_VIEW_USER')")
     public List<UserResponse> getUsers() {
         log.info("in method getUsers");
         List<User> users = userRepo.findUsersByIsDeletedFalse();
@@ -114,7 +110,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    @PreAuthorize("hasAuthority('ROLE_VIEW_USER_DETAIL')")
     public UserResponse getUserById(Long id) {
         return userMapper.toUserResponse(userRepo
                 .findUserByIdAndIsDeletedFalse(id)

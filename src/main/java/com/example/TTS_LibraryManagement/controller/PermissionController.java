@@ -13,6 +13,7 @@ import lombok.experimental.FieldDefaults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +25,9 @@ import java.util.List;
 public class PermissionController {
     PermissionService permissionService;
     static final Logger logger = LoggerFactory.getLogger(PermissionController.class);
+
     @PostMapping("/create")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<PermissionResponse> createPermission(@RequestBody PermissionCreationRequest request) {
         ApiResponse<PermissionResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully created permission");
@@ -33,6 +36,7 @@ public class PermissionController {
     }
 
     @GetMapping
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<List<PermissionResponse>> getPermissions() {
         ApiResponse<List<PermissionResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved users");
@@ -41,6 +45,7 @@ public class PermissionController {
     }
 
     @GetMapping("/detail/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<PermissionResponse> getPermissionById(@PathVariable("id") Long userId) {
         ApiResponse<PermissionResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved user with ID " + userId);
@@ -49,6 +54,7 @@ public class PermissionController {
     }
 
     @PutMapping("/update/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<PermissionResponse> updatePermission(@PathVariable Long id, @RequestBody PermissionUpdateRequest request) {
         ApiResponse<PermissionResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully updated user");
@@ -57,6 +63,7 @@ public class PermissionController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<PermissionResponse> deletePermission(@PathVariable Long id) {
         ApiResponse<PermissionResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully deleted user");
@@ -65,14 +72,16 @@ public class PermissionController {
     }
 
     @PostMapping("/find-by-user")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<Page<PermissionResponse>> searchPermissions(@RequestParam(name = "pageNo") int pageNo, @RequestParam(name = "pageSize") int pageSize, @RequestBody PermissionSearchByUserRequest request) {
         ApiResponse<Page<PermissionResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved permissions");
-        apiResponse.setResult(permissionService.getPermissionsByPage(pageNo,pageSize,request));
+        apiResponse.setResult(permissionService.getPermissionsByPage(pageNo, pageSize, request));
         return apiResponse;
     }
 
     @PatchMapping("/restore/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<RoleResponse> restorePermission(@PathVariable Long id) {
         ApiResponse<RoleResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully restored permission with id " + id);

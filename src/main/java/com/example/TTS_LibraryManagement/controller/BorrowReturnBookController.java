@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,14 +23,16 @@ public class BorrowReturnBookController {
     BorrowReturnBookService borrowReturnBookService;
 
     @PostMapping("/create/{userId}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<BorrowReturnBookResponse> createBR(@PathVariable Long userId, @RequestBody BRBookCreationRequest request) {
         ApiResponse<BorrowReturnBookResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully created Borrow Return Book");
-        apiResponse.setResult(borrowReturnBookService.createBorrowReturnBook(userId,request));
+        apiResponse.setResult(borrowReturnBookService.createBorrowReturnBook(userId, request));
         return apiResponse;
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<List<BorrowReturnBookResponse>> getBRByUserId(@PathVariable Long id) {
         ApiResponse<List<BorrowReturnBookResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved Borrow Return Book");
@@ -38,6 +41,7 @@ public class BorrowReturnBookController {
     }
 
     @GetMapping("/detail/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<BorrowReturnBookResponse> getBRById(@PathVariable Long id) {
         ApiResponse<BorrowReturnBookResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved Borrow Return Book");
@@ -46,6 +50,7 @@ public class BorrowReturnBookController {
     }
 
     @PutMapping("/update/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<BorrowReturnBookResponse> updateBR(@PathVariable Long id, @RequestBody BRBookUpdateRequest request) {
         ApiResponse<BorrowReturnBookResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully updated Borrow Return Book");
@@ -54,6 +59,7 @@ public class BorrowReturnBookController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<BorrowReturnBookResponse> deleteBR(@PathVariable Long id) {
         ApiResponse<BorrowReturnBookResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully deleted Borrow Return Book");
@@ -62,6 +68,7 @@ public class BorrowReturnBookController {
     }
 
     @PatchMapping("/restore/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<BorrowReturnBookResponse> restoreBR(@PathVariable Long id) {
         ApiResponse<BorrowReturnBookResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully restored Borrow Return Book");

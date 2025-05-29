@@ -9,6 +9,7 @@ import com.example.TTS_LibraryManagement.dto.request.User.UserUpdateRequest;
 import com.example.TTS_LibraryManagement.dto.response.Role.RoleResponse;
 import com.example.TTS_LibraryManagement.dto.response.User.UserResponse;
 import com.example.TTS_LibraryManagement.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/create")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully created user");
@@ -38,7 +40,8 @@ public class UserController {
     }
 
     @GetMapping
-    ApiResponse<List<UserResponse>> getUsers() {
+    @PreAuthorize("fileRole(#httpServletRequest)")
+    ApiResponse<List<UserResponse>> getUsers(HttpServletRequest httpServletRequest) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         log.info("Username : {}", authentication.getName());
         authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
@@ -48,7 +51,9 @@ public class UserController {
         return apiResponse;
     }
 
+
     @GetMapping("/detail/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<UserResponse> getUserById(@PathVariable("id") Long userId) {
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved user with ID " + userId);
@@ -57,6 +62,7 @@ public class UserController {
     }
 
     @PutMapping("/update/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<UserResponse> updateUser(@PathVariable Long id, @RequestBody UserUpdateRequest request) {
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully updated user");
@@ -65,6 +71,7 @@ public class UserController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<UserResponse> deleteUser(@PathVariable Long id) {
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully deleted user with ID: " + id);
@@ -73,6 +80,7 @@ public class UserController {
     }
 
     @PostMapping("/search")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<Page<UserResponse>> searchUser(@RequestParam(name = "pageNo") int pageNo, @RequestParam(name = "pageSize") int pageSize, @RequestBody UserSearchRequest request) {
         ApiResponse<Page<UserResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved users");
@@ -81,6 +89,7 @@ public class UserController {
     }
 
     @PatchMapping("/restore/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<RoleResponse> restoreUser(@PathVariable Long id) {
         ApiResponse<RoleResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully restored user with id " + id);

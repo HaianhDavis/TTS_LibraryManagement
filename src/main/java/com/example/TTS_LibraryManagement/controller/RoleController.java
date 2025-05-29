@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class RoleController {
     RoleService roleService;
 
     @PostMapping("/create")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<RoleResponse> createRole(@RequestBody RoleCreationRequest request) {
         ApiResponse<RoleResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully created role");
@@ -32,6 +34,7 @@ public class RoleController {
     }
 
     @GetMapping
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<List<RoleResponse>> getRoles() {
         ApiResponse<List<RoleResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved all roles");
@@ -40,6 +43,7 @@ public class RoleController {
     }
 
     @GetMapping("/detail/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<RoleResponse> getRoleById(@PathVariable Long id) {
         ApiResponse<RoleResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved role with id " + id);
@@ -48,6 +52,7 @@ public class RoleController {
     }
 
     @PutMapping("/update/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<RoleResponse> updateRole(@PathVariable Long id, @RequestBody RoleUpdateRequest request) {
         ApiResponse<RoleResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully updated role with id " + id);
@@ -56,6 +61,7 @@ public class RoleController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<RoleResponse> deleteRole(@PathVariable Long id) {
         ApiResponse<RoleResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully deleted role with id " + id);
@@ -64,6 +70,7 @@ public class RoleController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<Page<RoleResponse>> searchRoles(@RequestParam(name = "pageNo") int pageNo, @RequestParam(name = "pageSize") int pageSize) {
         ApiResponse<Page<RoleResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved all roles");
@@ -72,6 +79,7 @@ public class RoleController {
     }
 
     @PatchMapping("/restore/{id}")
+    @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<RoleResponse> restoreRole(@PathVariable Long id) {
         ApiResponse<RoleResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully restored role with id " + id);
