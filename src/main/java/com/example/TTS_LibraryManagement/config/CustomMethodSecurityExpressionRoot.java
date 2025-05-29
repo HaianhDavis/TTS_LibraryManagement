@@ -7,9 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -43,6 +45,10 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
     }
 
     public boolean fileRole(HttpServletRequest httpServletRequest) {
+        boolean hasRequiredScope = hasAuthority("ADMIN");
+        if (hasRequiredScope) {
+            return true;
+        }
         log.info("Entering fileRole with HttpServletRequest: {}", httpServletRequest);
         try {
             if (Objects.isNull(httpServletRequest)) {

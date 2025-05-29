@@ -7,6 +7,9 @@ import com.example.TTS_LibraryManagement.dto.request.Permission.PermissionCreati
 import com.example.TTS_LibraryManagement.dto.response.Permission.PermissionResponse;
 import com.example.TTS_LibraryManagement.dto.response.Role.RoleResponse;
 import com.example.TTS_LibraryManagement.service.PermissionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,67 +25,75 @@ import java.util.List;
 @RequestMapping("/permission")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Tag(name = "Permission", description = "Permission Management APIs")
 public class PermissionController {
     PermissionService permissionService;
     static final Logger logger = LoggerFactory.getLogger(PermissionController.class);
 
+    @Operation(summary = "Create a new permission")
     @PostMapping("/create")
     @PreAuthorize("fileRole(#httpServletRequest)")
-    ApiResponse<PermissionResponse> createPermission(@RequestBody PermissionCreationRequest request) {
+    ApiResponse<PermissionResponse> createPermission(HttpServletRequest httpServletRequest, @RequestBody PermissionCreationRequest request) {
         ApiResponse<PermissionResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully created permission");
         apiResponse.setResult(permissionService.createPermission(request));
         return apiResponse;
     }
 
+    @Operation(summary = "Get all permissions")
     @GetMapping
     @PreAuthorize("fileRole(#httpServletRequest)")
-    ApiResponse<List<PermissionResponse>> getPermissions() {
+    ApiResponse<List<PermissionResponse>> getPermissions(HttpServletRequest httpServletRequest) {
         ApiResponse<List<PermissionResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved users");
         apiResponse.setResult(permissionService.getPermissions());
         return apiResponse;
     }
 
+    @Operation(summary = "Get permission by ID")
     @GetMapping("/detail/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
-    ApiResponse<PermissionResponse> getPermissionById(@PathVariable("id") Long userId) {
+    ApiResponse<PermissionResponse> getPermissionById(HttpServletRequest httpServletRequest, @PathVariable("id") Long userId) {
         ApiResponse<PermissionResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved user with ID " + userId);
         apiResponse.setResult(permissionService.getPermissionById(userId));
         return apiResponse;
     }
 
+    @Operation(summary = "Update permission by ID")
     @PutMapping("/update/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
-    ApiResponse<PermissionResponse> updatePermission(@PathVariable Long id, @RequestBody PermissionUpdateRequest request) {
+    ApiResponse<PermissionResponse> updatePermission(HttpServletRequest httpServletRequest, @PathVariable Long id, @RequestBody PermissionUpdateRequest request) {
         ApiResponse<PermissionResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully updated user");
         apiResponse.setResult(permissionService.updatePermission(id, request));
         return apiResponse;
     }
 
+    @Operation(summary = "Delete permission by ID")
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
-    ApiResponse<PermissionResponse> deletePermission(@PathVariable Long id) {
+    ApiResponse<PermissionResponse> deletePermission(HttpServletRequest httpServletRequest, @PathVariable Long id) {
         ApiResponse<PermissionResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully deleted user");
         permissionService.deletePermission(id);
         return apiResponse;
     }
 
+    @Operation(summary = "Search permissions by user")
     @PostMapping("/find-by-user")
     @PreAuthorize("fileRole(#httpServletRequest)")
-    ApiResponse<Page<PermissionResponse>> searchPermissions(@RequestParam(name = "pageNo") int pageNo, @RequestParam(name = "pageSize") int pageSize, @RequestBody PermissionSearchByUserRequest request) {
+    ApiResponse<Page<PermissionResponse>> searchPermissions(HttpServletRequest httpServletRequest, @RequestParam(name = "pageNo") int pageNo, @RequestParam(name = "pageSize") int pageSize, @RequestBody PermissionSearchByUserRequest request) {
         ApiResponse<Page<PermissionResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully retrieved permissions");
         apiResponse.setResult(permissionService.getPermissionsByPage(pageNo, pageSize, request));
         return apiResponse;
     }
 
+    @Operation(summary = "Restore a permission by ID")
     @PatchMapping("/restore/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
-    ApiResponse<RoleResponse> restorePermission(@PathVariable Long id) {
+    ApiResponse<RoleResponse> restorePermission(HttpServletRequest httpServletRequest, @PathVariable Long id) {
         ApiResponse<RoleResponse> apiResponse = new ApiResponse<>();
         apiResponse.setMessage("Successfully restored permission with id " + id);
         permissionService.restorePermission(id);

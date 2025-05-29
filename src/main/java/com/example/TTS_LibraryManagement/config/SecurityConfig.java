@@ -33,6 +33,10 @@ public class SecurityConfig {
             "/auth/introspect",
             "/auth/logout",
             "/auth/refresh",
+            // Swagger endpoints
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs/**"
     };
 
     CustomJwtDecoder customJwtDecoder;
@@ -43,7 +47,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(authorizeRequests ->
-                authorizeRequests.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                authorizeRequests.requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                         .anyRequest().authenticated());
         httpSecurity.oauth2ResourceServer(oauth2ResourceServer ->
                 oauth2ResourceServer.jwt(jwtConfigurer ->
@@ -67,6 +71,7 @@ public class SecurityConfig {
 
             if (roles != null) {
                 for (String roleCode : roles) {
+                    authorities.add(new SimpleGrantedAuthority(roleCode));
                     List<String> permissions = roleRepo.getAllPermissionOfRole(roleCode);
                     for (String permissionCode : permissions) {
                         authorities.add(new SimpleGrantedAuthority(permissionCode));
