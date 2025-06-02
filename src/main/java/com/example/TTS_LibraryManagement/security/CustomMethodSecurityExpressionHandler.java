@@ -1,4 +1,4 @@
-package com.example.TTS_LibraryManagement.config;
+package com.example.TTS_LibraryManagement.security;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
