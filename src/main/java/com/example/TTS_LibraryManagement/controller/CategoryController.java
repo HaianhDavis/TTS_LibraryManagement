@@ -7,6 +7,7 @@ import com.example.TTS_LibraryManagement.dto.response.Dashboard.DashboardBookRes
 import com.example.TTS_LibraryManagement.dto.response.Role.RoleResponse;
 import com.example.TTS_LibraryManagement.dto.response.Category.CategoryResponse;
 import com.example.TTS_LibraryManagement.service.CategoryService;
+import com.example.TTS_LibraryManagement.utils.ApiUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,79 +33,57 @@ public class CategoryController {
     @PostMapping("/create")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<CategoryResponse> createCategory(HttpServletRequest httpServletRequest, @RequestBody @Valid CategoryCreationRequest request) {
-        ApiResponse<CategoryResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully created Category");
-        apiResponse.setResult(categoryService.createCategory(request));
-        return apiResponse;
+       return ApiUtils.success(categoryService.createCategory(request));
     }
 
     @Operation(summary = "Get all categories")
     @GetMapping
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<List<CategoryResponse>> getCategories(HttpServletRequest httpServletRequest) {
-        ApiResponse<List<CategoryResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully retrieved categories");
-        apiResponse.setResult(categoryService.getCategories());
-        return apiResponse;
+        return ApiUtils.success(categoryService.getCategories());
     }
 
     @Operation(summary = "Get category by ID")
     @GetMapping("/detail/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<CategoryResponse> getCategoryById(HttpServletRequest httpServletRequest, @PathVariable("id") Long CategoryId) {
-        ApiResponse<CategoryResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully retrieved Category with ID " + CategoryId);
-        apiResponse.setResult(categoryService.getCategoryById(CategoryId));
-        return apiResponse;
+        return ApiUtils.success(categoryService.getCategoryById(CategoryId));
     }
 
     @Operation(summary = "Update category by ID")
     @PutMapping("/update/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
-    ApiResponse<CategoryResponse> updateCategory(HttpServletRequest httpServletRequest, @PathVariable Long id, @RequestBody CategoryUpdateRequest request) {
-        ApiResponse<CategoryResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully updated Category");
-        apiResponse.setResult(categoryService.updateCategory(id, request));
-        return apiResponse;
+    ApiResponse<CategoryResponse> updateCategory(HttpServletRequest httpServletRequest, @PathVariable Long id, @RequestBody @Valid CategoryUpdateRequest request) {
+        return ApiUtils.success(categoryService.updateCategory(id, request));
     }
 
     @Operation(summary = "Delete category by ID")
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<CategoryResponse> deleteCategory(HttpServletRequest httpServletRequest, @PathVariable Long id) {
-        ApiResponse<CategoryResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully deleted Category with ID: " + id);
         categoryService.deleteCategory(id);
-        return apiResponse;
+        return ApiUtils.successDeleteOrRestore("Successfully deleted Category with ID: " + id);
     }
 
     @Operation(summary = "Search categories with pagination")
     @GetMapping("/search")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<Page<CategoryResponse>> searchCategory(HttpServletRequest httpServletRequest, @RequestParam(name = "pageNo") int pageNo, @RequestParam(name = "pageSize") int pageSize) {
-        ApiResponse<Page<CategoryResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully retrieved categories");
-        apiResponse.setResult(categoryService.getCategoriesByPage(pageNo, pageSize));
-        return apiResponse;
+        return ApiUtils.success(categoryService.getCategoriesByPage(pageNo, pageSize));
     }
 
     @Operation(summary = "Restore category by ID")
     @PatchMapping("/restore/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<RoleResponse> restoreCategory(HttpServletRequest httpServletRequest, @PathVariable Long id) {
-        ApiResponse<RoleResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully restored Category with id " + id);
         categoryService.restoreCategory(id);
-        return apiResponse;
+        return ApiUtils.successDeleteOrRestore("Successfully restored Category with id " + id);
     }
 
     @Operation(summary = "Get statistics by category")
     @GetMapping("/statistics")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<List<DashboardBookResponse>> getStatistics(HttpServletRequest httpServletRequest) {
-        ApiResponse<List<DashboardBookResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully created comment!");
-        apiResponse.setResult(categoryService.getStatisticsByCategory());
-        return apiResponse;
+        return ApiUtils.success(categoryService.getStatisticsByCategory());
     }
 }

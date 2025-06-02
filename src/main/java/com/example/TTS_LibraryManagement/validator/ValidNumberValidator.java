@@ -1,4 +1,4 @@
-package com.example.TTS_LibraryManagement.exception;
+package com.example.TTS_LibraryManagement.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

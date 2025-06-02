@@ -9,7 +9,7 @@ import com.example.TTS_LibraryManagement.dto.response.IntrospectResponse;
 import com.example.TTS_LibraryManagement.entity.RefreshToken;
 import com.example.TTS_LibraryManagement.entity.User;
 import com.example.TTS_LibraryManagement.exception.AppException;
-import com.example.TTS_LibraryManagement.exception.ErrorCode;
+import com.example.TTS_LibraryManagement.enums.ErrorCode;
 import com.example.TTS_LibraryManagement.repository.RefreshTokenRepo;
 import com.example.TTS_LibraryManagement.repository.RoleRepo;
 import com.example.TTS_LibraryManagement.repository.UserRepo;

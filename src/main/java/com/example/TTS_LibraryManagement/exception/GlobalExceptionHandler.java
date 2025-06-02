@@ -2,6 +2,7 @@ package com.example.TTS_LibraryManagement.exception;
 
 
 import com.example.TTS_LibraryManagement.dto.response.ApiResponse;
+import com.example.TTS_LibraryManagement.enums.ErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -24,16 +25,18 @@ public class GlobalExceptionHandler {
         apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
         return ResponseEntity.badRequest().body(apiResponse);
     }
-    @ExceptionHandler(value = AppException.class)
-    public ResponseEntity<ApiResponse> handlingAppException(AppException exception) {
-        ErrorCode errorCode = exception.getErrorCode();
-        ApiResponse apiResponse = new ApiResponse<>();
-        apiResponse.setCode(errorCode.getCode());
-        apiResponse.setMessage(errorCode.getMessage());
-        return ResponseEntity
-                .status(errorCode.getStatusCode())
-                .body(apiResponse);
+    @ExceptionHandler(AppException.class)
+    public ResponseEntity<ApiResponse<Object>> handlingAppException(AppException ex) {
+        String errorCode = ex.getErrorCode() != null ? ex.getErrorCode().getCode() : "UNKNOWN_ERROR";
+        return new ResponseEntity<>(
+                ApiResponse.builder()
+                        .code(errorCode)
+                        .message(ex.getMessage() != null ? ex.getMessage() : "An error occurred")
+                        .error(ex.getErrors() != null ? ex.getErrors() : null)
+                        .build(),
+                HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(value = AccessDeniedException.class)
     public ResponseEntity<ApiResponse> handlingAccessDeniedException(AccessDeniedException exception) {
         ErrorCode errorCode = ErrorCode.UNAUTHORIZED;

@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  app:
+    image: spring-boot-demo
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8094:8094" # Đổi cổng từ 8080 thành 8094 để khớp với application.yml
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/library_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=170922Davis@
+      - JWT_SIGNER_KEY=GscuJW11GiHLuIhqbvA3lnnpF3q1X5q2WzgpS9eUJ+LNNoL3b31GqUoTNZCDndlS
+      - SERVER_URL=http://localhost:8094/identity/api/v1/library
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  db:
+    image: mariadb:latest
+    environment:
+      - MYSQL_DATABASE=library_db # Đổi thành library_db
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=170922Davis@ # Khớp với mật khẩu trong application.yml
+      - MYSQL_ROOT_PASSWORD=170922Davis@ # Khớp với mật khẩu root
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - app-network
+
+volumes:
+  db-data:
+
+networks:
+  app-network:
+    driver: bridge

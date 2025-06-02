@@ -7,10 +7,11 @@ import com.example.TTS_LibraryManagement.dto.request.Book.ErrorRecordBook;
 import com.example.TTS_LibraryManagement.dto.response.ApiResponse;
 import com.example.TTS_LibraryManagement.dto.response.Book.BookCategoryResponse;
 import com.example.TTS_LibraryManagement.dto.response.Book.BookResponse;
+import com.example.TTS_LibraryManagement.dto.response.Book.ImportBooksResult;
 import com.example.TTS_LibraryManagement.entity.Book;
 import com.example.TTS_LibraryManagement.entity.Category;
 import com.example.TTS_LibraryManagement.exception.AppException;
-import com.example.TTS_LibraryManagement.exception.ErrorCode;
+import com.example.TTS_LibraryManagement.enums.ErrorCode;
 import com.example.TTS_LibraryManagement.mapper.BookMapper;
 import com.example.TTS_LibraryManagement.repository.BookRepo;
 import com.example.TTS_LibraryManagement.repository.CategoryRepo;
@@ -20,7 +21,6 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -58,6 +57,9 @@ public class BookServiceImpl implements BookService {
             throw new AppException(ErrorCode.BOOK_EXISTED);
         }
         Book book = bookMapper.toBookCreate(request);
+        if (book.getCategories() == null) {
+            book.setCategories(new HashSet<>());
+        }
         if (request.getCategoryIds() != null && !request.getCategoryIds().isEmpty()) {
             List<Category> categories = categoryRepo.findAllByIdInAndIsDeletedFalse(request.getCategoryIds());
             if (categories.size() != request.getCategoryIds().size()) {
@@ -183,18 +185,85 @@ public class BookServiceImpl implements BookService {
         });
     }
 
+//    @Transactional
+//    public ApiResponse<List<ErrorRecordBook>> importBooksFromExcel(final MultipartFile file) {
+//        List<ErrorRecordBook> errorRecords = new ArrayList<>();
+//        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+//            Sheet sheet = workbook.getSheetAt(0);
+//            boolean isFirstRow = true;
+//            int rowNum = 0;
+//            for (Row row : sheet) {
+//                rowNum++;
+//                if (isFirstRow) { isFirstRow = false; continue; }
+//
+//                // Xử lý an toàn trước khi tạo BookCreationRequest
+//                try {
+//                    BookCreationRequest bookCreationRequest = BookCreationRequest.builder()
+//                            .code(getCellValueAsString(row.getCell(0)))
+//                            .title(getCellValueAsString(row.getCell(1)))
+//                            .author(getCellValueAsString(row.getCell(2)))
+//                            .publisher(getCellValueAsString(row.getCell(3)))
+//                            .pageCount(getNumericCellValue(row.getCell(4), 0))
+//                            .printType(getCellValueAsString(row.getCell(5)))
+//                            .language(getCellValueAsString(row.getCell(6)))
+//                            .description(getCellValueAsString(row.getCell(7)))
+//                            .quantity(getNumericCellValue(row.getCell(8), 0))
+//                            .build();
+//
+//                    String categoryIdsStr = getCellValueAsString(row.getCell(9));
+//                    log.info("Category IDs string at row {}: {}", rowNum, categoryIdsStr);
+//
+//                    Set<Long> categoryIds = parseCategoryIds(categoryIdsStr);
+//                    log.info("Parsed category ids at row {}: {}", rowNum, categoryIds);
+//
+//                    bookCreationRequest.setCategoryIds(categoryIds);
+//                    log.info("Book creation request at row {}: {}", rowNum, bookCreationRequest.toString());
+//                    createBook(bookCreationRequest);
+//                } catch (AppException e) {
+//                    log.error("Lỗi khi xử lý dòng {}: {}", rowNum, e.getMessage());
+//                    errorRecords.add(new ErrorRecordBook(rowNum, e.getErrorCode().getCode(), e.getMessage()));
+//                } catch (Exception e) {
+//                    log.error("Lỗi bất ngờ khi xử lý dòng {}: {}", rowNum, e.getMessage());
+//                    errorRecords.add(new ErrorRecordBook(rowNum, ErrorCode.UNCATEGORIZED_EXCEPTION.getCode(), e.getMessage()));
+//                }
+//            }
+//        } catch (IOException e) {
+//            log.error("Lỗi khi đọc file Excel", e);
+//            throw new AppException(ErrorCode.FAILED_TO_IMPORT_EXCEL);
+//        }
+//        if (!errorRecords.isEmpty()) {
+//            return ApiResponse.<List<ErrorRecordBook>>builder()
+//                    .code("IMPORT_ERRORS")
+//                    .message("Có lỗi xảy ra khi nhập sách từ file Excel")
+//                    .result(errorRecords)
+//                    .build();
+//        }
+//
+//        return ApiResponse.<List<ErrorRecordBook>>builder()
+//                .code("PASSED")
+//                .message("Nhập sách thành công")
+//                .result(null)
+//                .build();
+//    }
+
+
     @Transactional
-    public ApiResponse<List<ErrorRecordBook>> importBooksFromExcel(final MultipartFile file) {
+    public ImportBooksResult importBooksFromExcel(final MultipartFile file) {
+        List<BookResponse> successfulImports = new ArrayList<>();
         List<ErrorRecordBook> errorRecords = new ArrayList<>();
+
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
             boolean isFirstRow = true;
             int rowNum = 0;
+
             for (Row row : sheet) {
                 rowNum++;
-                if (isFirstRow) { isFirstRow = false; continue; }
+                if (isFirstRow) {
+                    isFirstRow = false;
+                    continue;
+                }
 
-                // Xử lý an toàn trước khi tạo BookCreationRequest
                 try {
                     BookCreationRequest bookCreationRequest = BookCreationRequest.builder()
                             .code(getCellValueAsString(row.getCell(0)))
@@ -209,40 +278,27 @@ public class BookServiceImpl implements BookService {
                             .build();
 
                     String categoryIdsStr = getCellValueAsString(row.getCell(9));
-                    log.info("Category IDs string at row {}: {}", rowNum, categoryIdsStr);
-
                     Set<Long> categoryIds = parseCategoryIds(categoryIdsStr);
-                    log.info("Parsed category ids at row {}: {}", rowNum, categoryIds);
-
                     bookCreationRequest.setCategoryIds(categoryIds);
-                    log.info("Book creation request at row {}: {}", rowNum, bookCreationRequest.toString());
-                    createBook(bookCreationRequest);
+                    BookResponse bookResponse = createBook(bookCreationRequest);
+                    successfulImports.add(bookResponse);
                 } catch (AppException e) {
-                    log.error("Lỗi khi xử lý dòng {}: {}", rowNum, e.getMessage());
-                    errorRecords.add(new ErrorRecordBook(rowNum, e.getErrorCode().getCode(), e.getMessage()));
+                    errorRecords.add(new ErrorRecordBook(rowNum,
+                            e.getErrorCode() != null ? e.getErrorCode().getCode() : "UNKNOWN_ERROR",
+                            e.getMessage()));
                 } catch (Exception e) {
-                    log.error("Lỗi bất ngờ khi xử lý dòng {}: {}", rowNum, e.getMessage());
-                    errorRecords.add(new ErrorRecordBook(rowNum, ErrorCode.UNCATEGORIZED_EXCEPTION.getCode(), e.getMessage()));
+                    errorRecords.add(new ErrorRecordBook(rowNum,
+                            ErrorCode.ROW_ERROR.getCode(),
+                            e.getMessage()));
                 }
             }
         } catch (IOException e) {
-            log.error("Lỗi khi đọc file Excel", e);
-            throw new AppException(ErrorCode.FAILED_TO_IMPORT_EXCEL);
-        }
-        if (!errorRecords.isEmpty()) {
-            return ApiResponse.<List<ErrorRecordBook>>builder()
-                    .code("IMPORT_ERRORS")
-                    .message("Có lỗi xảy ra khi nhập sách từ file Excel")
-                    .result(errorRecords)
-                    .build();
+            errorRecords.add(new ErrorRecordBook(0, ErrorCode.FAILED_TO_IMPORT_EXCEL.getCode(), "Lỗi khi đọc Excel"));
         }
 
-        return ApiResponse.<List<ErrorRecordBook>>builder()
-                .code("PASSED")
-                .message("Nhập sách thành công")
-                .result(null)
-                .build();
+        return new ImportBooksResult(successfulImports, errorRecords);
     }
+
 
     private String getCellValueAsString(Cell cell) {
         if (cell == null) {
@@ -344,7 +400,7 @@ public class BookServiceImpl implements BookService {
                 row.createCell(8).setCellValue(book.getDescription());
                 row.createCell(9).setCellValue(book.getQuantity());
                 String categoryIds = book.getCategories().stream()
-                        .map(category -> String.valueOf(category.getId()))
+                        .map(category -> String.valueOf(category.getCategoryName()))
                         .collect(Collectors.joining(", "));
                 row.createCell(10).setCellValue(categoryIds);
             }

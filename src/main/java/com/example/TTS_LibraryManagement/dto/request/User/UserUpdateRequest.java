@@ -1,5 +1,6 @@
 package com.example.TTS_LibraryManagement.dto.request.User;
 
+import com.example.TTS_LibraryManagement.validator.DobConstraint;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,6 +33,7 @@ public class UserUpdateRequest {
     @Min(value = 0, message = "AGE_MUST_BE_POSITIVE")
     Integer age;
 
+    @DobConstraint(min = 12)
     LocalDate birthday;
 
     @NotBlank(message = "NOT_BLANK")

@@ -1,5 +1,6 @@
 package com.example.TTS_LibraryManagement.dto.request.Post;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -12,7 +13,8 @@ import java.sql.Timestamp;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ToString
 public class PostUpdateRequest {
-    Long bookId;
+    @NotBlank(message = "NOT_BLANK")
     String title;
+    @NotBlank(message = "NOT_BLANK")
     String content;
 }

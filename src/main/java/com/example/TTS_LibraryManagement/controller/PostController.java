@@ -8,9 +8,11 @@ import com.example.TTS_LibraryManagement.dto.response.Dashboard.DashboardPostRes
 import com.example.TTS_LibraryManagement.dto.response.Post.PostLikeResponse;
 import com.example.TTS_LibraryManagement.dto.response.Post.PostResponse;
 import com.example.TTS_LibraryManagement.service.PostService;
+import com.example.TTS_LibraryManagement.utils.ApiUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -32,80 +34,58 @@ public class PostController {
     @Operation(summary = "Create a new post")
     @PostMapping("/create/{userId}")
     @PreAuthorize("fileRole(#httpServletRequest)")
-    ApiResponse<PostResponse> createPost(HttpServletRequest httpServletRequest, @PathVariable Long userId, @RequestBody PostCreationRequest request) {
-        ApiResponse<PostResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully created post!");
-        apiResponse.setResult(postService.createPost(userId, request));
-        return apiResponse;
+    ApiResponse<PostResponse> createPost(HttpServletRequest httpServletRequest, @PathVariable Long userId, @RequestBody @Valid PostCreationRequest request) {
+        return ApiUtils.success(postService.createPost(userId, request));
     }
 
     @Operation(summary = "Get all posts")
     @GetMapping
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<List<PostResponse>> getPosts(HttpServletRequest httpServletRequest) {
-        ApiResponse<List<PostResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully retrieved posts!");
-        apiResponse.setResult(postService.getPosts());
-        return apiResponse;
+        return ApiUtils.success(postService.getPosts());
     }
 
     @Operation(summary = "Get posts by user ID")
     @GetMapping("/detail/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<PostResponse> getPost(HttpServletRequest httpServletRequest, @PathVariable Long id) {
-        ApiResponse<PostResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully retrieved post!");
-        apiResponse.setResult(postService.getPost(id));
-        return apiResponse;
+        return ApiUtils.success(postService.getPost(id));
     }
 
     @Operation(summary = "Search posts by title")
     @PutMapping("/update/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
-    ApiResponse<PostResponse> updatePost(HttpServletRequest httpServletRequest, @PathVariable Long id, @RequestBody PostUpdateRequest request) {
-        ApiResponse<PostResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully updated post!");
-        apiResponse.setResult(postService.updatePost(id, request));
-        return apiResponse;
+    ApiResponse<PostResponse> updatePost(HttpServletRequest httpServletRequest, @PathVariable Long id, @RequestBody @Valid PostUpdateRequest request) {
+        return ApiUtils.success(postService.updatePost(id, request));
     }
 
     @Operation(summary = "Delete a post")
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<PostResponse> deletePost(HttpServletRequest httpServletRequest, @PathVariable Long id) {
-        ApiResponse<PostResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully deleted post!");
         postService.deletePost(id);
-        return apiResponse;
+        return ApiUtils.successDeleteOrRestore("Successfully deleted post with ID: " + id);
     }
 
     @Operation(summary = "Like or dislike a post")
     @PatchMapping("/restore/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<PostResponse> restorePost(HttpServletRequest httpServletRequest, @PathVariable Long id) {
-        ApiResponse<PostResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully restored post!");
         postService.restorePost(id);
-        return apiResponse;
+        return ApiUtils.successDeleteOrRestore("Successfully restored post with ID: " + id);
     }
 
     @Operation(summary = "Get posts by pagination")
     @PostMapping("/like/{userId}")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<PostLikeResponse> likePost(HttpServletRequest httpServletRequest, @PathVariable Long userId, @RequestBody LikeOrDislikeRequest request) {
-        ApiResponse<PostLikeResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully liked post!");
-        apiResponse.setResult(postService.likeOrDislikePost(userId, request));
-        return apiResponse;
+        return ApiUtils.success(postService.likeOrDislikePost(userId, request));
     }
 
     @Operation(summary = "Get top liked posts")
     @GetMapping("/top-liked")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<List<DashboardPostResponse>> getTopLikedPosts(HttpServletRequest httpServletRequest) {
-        ApiResponse<List<DashboardPostResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully retrieved top liked posts!");
-        apiResponse.setResult(postService.getListTopLiked());
-        return apiResponse;
+        return ApiUtils.success(postService.getListTopLiked());
     }
 }

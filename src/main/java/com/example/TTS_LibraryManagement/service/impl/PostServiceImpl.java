@@ -11,7 +11,7 @@ import com.example.TTS_LibraryManagement.entity.Post;
 import com.example.TTS_LibraryManagement.entity.PostLike;
 import com.example.TTS_LibraryManagement.entity.User;
 import com.example.TTS_LibraryManagement.exception.AppException;
-import com.example.TTS_LibraryManagement.exception.ErrorCode;
+import com.example.TTS_LibraryManagement.enums.ErrorCode;
 import com.example.TTS_LibraryManagement.mapper.PostMapper;
 import com.example.TTS_LibraryManagement.repository.BookRepo;
 import com.example.TTS_LibraryManagement.repository.PostLikeRepo;
@@ -94,8 +94,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public PostResponse updatePost(Long id, PostUpdateRequest request) {
         Post post = postRepo.findByPostId(id).orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
-        Book newBook = bookRepo.findBookByIdAndIsDeletedFalse(request.getBookId()).orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_FOUND));
-        if (request.getTitle().equals(post.getTitle()) && request.getContent().equals(post.getContent()) && post.getBook().equals(newBook)) {
+        if (request.getTitle().equals(post.getTitle()) && request.getContent().equals(post.getContent())) {
             throw new AppException(ErrorCode.POST_NOT_CHANGED);
         }
         postMapper.toPostUpdate(post, request);
@@ -103,9 +102,8 @@ public class PostServiceImpl implements PostService {
         postRepo.save(post);
         PostResponse response = postMapper.toPostResponse(post);
         response.setUser(postMapper.toPostUserResponse(userRepo.findUserByPostIdAndIsDeletedFalse(id).orElseThrow()));
-        response.setBook(postMapper.toPostBookResponse(newBook));
+        response.setBook(postMapper.toPostBookResponse(post.getBook()));
         response.setTotalLikes(postRepo.findTotalLikesByPostId(post.getId()));
-
         return response;
     }
 

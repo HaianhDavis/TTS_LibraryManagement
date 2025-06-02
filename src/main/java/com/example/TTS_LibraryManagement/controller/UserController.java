@@ -9,6 +9,7 @@ import com.example.TTS_LibraryManagement.dto.request.User.UserUpdateRequest;
 import com.example.TTS_LibraryManagement.dto.response.Role.RoleResponse;
 import com.example.TTS_LibraryManagement.dto.response.User.UserResponse;
 import com.example.TTS_LibraryManagement.service.UserService;
+import com.example.TTS_LibraryManagement.utils.ApiUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,10 +36,8 @@ public class UserController {
 
     @Operation(summary = "Tạo người dùng mới")
     @PostMapping("/create")
-    @PreAuthorize("fileRole(#httpServletRequest)")
-    ApiResponse<UserResponse> createUser(HttpServletRequest httpServletRequest, @RequestBody @Valid UserCreationRequest request) {
+    ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully created user");
         apiResponse.setResult(userService.createUser(request));
         return apiResponse;
     }
@@ -50,59 +49,43 @@ public class UserController {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         log.info("Username : {}", authentication.getName());
         authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
-        ApiResponse<List<UserResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully retrieved users");
-        apiResponse.setResult(userService.getUsers());
-        return apiResponse;
+        return ApiUtils.success(userService.getUsers());
     }
 
     @Operation(summary = "Lấy người dùng theo ID")
     @GetMapping("/detail/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<UserResponse> getUserById(HttpServletRequest httpServletRequest, @PathVariable("id") Long userId) {
-        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully retrieved user with ID " + userId);
-        apiResponse.setResult(userService.getUserById(userId));
-        return apiResponse;
+        return ApiUtils.success(userService.getUserById(userId));
     }
 
     @Operation(summary = "Cập nhật người dùng theo ID")
     @PutMapping("/update/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
-    ApiResponse<UserResponse> updateUser(HttpServletRequest httpServletRequest, @PathVariable Long id, @RequestBody UserUpdateRequest request) {
-        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully updated user");
-        apiResponse.setResult(userService.updateUser(id, request));
-        return apiResponse;
+    ApiResponse<UserResponse> updateUser(HttpServletRequest httpServletRequest, @PathVariable Long id, @RequestBody @Valid UserUpdateRequest request) {
+        return ApiUtils.success(userService.updateUser(id, request));
     }
 
     @Operation(summary = "Xóa người dùng theo ID")
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<UserResponse> deleteUser(HttpServletRequest httpServletRequest, @PathVariable Long id) {
-        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully deleted user with ID: " + id);
         userService.deleteUser(id);
-        return apiResponse;
+        return ApiUtils.successDeleteOrRestore("Successfully deleted user with ID: " + id);
     }
 
     @Operation(summary = "Lấy người dùng theo vai trò")
     @PostMapping("/search")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<Page<UserResponse>> searchUser(HttpServletRequest httpServletRequest, @RequestParam(name = "pageNo") int pageNo, @RequestParam(name = "pageSize") int pageSize, @RequestBody UserSearchRequest request) {
-        ApiResponse<Page<UserResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully retrieved users");
-        apiResponse.setResult(userService.getUsersByPage(pageNo,pageSize,request));
-        return apiResponse;
+        return ApiUtils.success(userService.getUsersByPage(pageNo, pageSize, request));
     }
 
     @Operation(summary = "Khôi phục người dùng đã xóa")
     @PatchMapping("/restore/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<RoleResponse> restoreUser(HttpServletRequest httpServletRequest, @PathVariable Long id) {
-        ApiResponse<RoleResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully restored user with id " + id);
         userService.restoreUser(id);
-        return apiResponse;
+        return ApiUtils.successDeleteOrRestore("Successfully restored user with ID: " + id);
     }
 }

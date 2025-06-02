@@ -7,7 +7,7 @@ import com.example.TTS_LibraryManagement.entity.Book;
 import com.example.TTS_LibraryManagement.entity.BorrowReturnBook;
 import com.example.TTS_LibraryManagement.entity.User;
 import com.example.TTS_LibraryManagement.exception.AppException;
-import com.example.TTS_LibraryManagement.exception.ErrorCode;
+import com.example.TTS_LibraryManagement.enums.ErrorCode;
 import com.example.TTS_LibraryManagement.mapper.BorrowReturnBookMapper;
 import com.example.TTS_LibraryManagement.repository.BookRepo;
 import com.example.TTS_LibraryManagement.repository.BorrowReturnBookRepo;

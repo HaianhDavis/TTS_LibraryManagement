@@ -2,16 +2,12 @@ package com.example.TTS_LibraryManagement.service.impl;
 
 import com.example.TTS_LibraryManagement.dto.request.Comment.CommentCreationRequest;
 import com.example.TTS_LibraryManagement.dto.request.Comment.CommentUpdateRequest;
-import com.example.TTS_LibraryManagement.dto.request.Post.PostCreationRequest;
-import com.example.TTS_LibraryManagement.dto.request.Post.PostUpdateRequest;
 import com.example.TTS_LibraryManagement.dto.response.Comment.CommentResponse;
-import com.example.TTS_LibraryManagement.dto.response.Post.PostResponse;
-import com.example.TTS_LibraryManagement.entity.Book;
 import com.example.TTS_LibraryManagement.entity.Comment;
 import com.example.TTS_LibraryManagement.entity.Post;
 import com.example.TTS_LibraryManagement.entity.User;
 import com.example.TTS_LibraryManagement.exception.AppException;
-import com.example.TTS_LibraryManagement.exception.ErrorCode;
+import com.example.TTS_LibraryManagement.enums.ErrorCode;
 import com.example.TTS_LibraryManagement.mapper.CommentMapper;
 import com.example.TTS_LibraryManagement.repository.CommentRepo;
 import com.example.TTS_LibraryManagement.repository.PostRepo;

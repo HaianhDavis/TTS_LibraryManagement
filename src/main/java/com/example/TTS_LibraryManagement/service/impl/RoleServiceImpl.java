@@ -7,7 +7,7 @@ import com.example.TTS_LibraryManagement.dto.response.Role.RoleResponse;
 import com.example.TTS_LibraryManagement.dto.response.Role.RoleUserResponse;
 import com.example.TTS_LibraryManagement.entity.*;
 import com.example.TTS_LibraryManagement.exception.AppException;
-import com.example.TTS_LibraryManagement.exception.ErrorCode;
+import com.example.TTS_LibraryManagement.enums.ErrorCode;
 import com.example.TTS_LibraryManagement.mapper.RoleMapper;
 import com.example.TTS_LibraryManagement.repository.*;
 import com.example.TTS_LibraryManagement.service.RoleService;
@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;

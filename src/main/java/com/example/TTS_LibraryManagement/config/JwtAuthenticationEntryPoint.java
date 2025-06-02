@@ -1,7 +1,7 @@
 package com.example.TTS_LibraryManagement.config;
 
 import com.example.TTS_LibraryManagement.dto.response.ApiResponse;
-import com.example.TTS_LibraryManagement.exception.ErrorCode;
+import com.example.TTS_LibraryManagement.enums.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

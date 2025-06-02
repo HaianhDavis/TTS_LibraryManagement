@@ -6,6 +6,7 @@ import com.example.TTS_LibraryManagement.dto.request.Book.BookUpdateRequest;
 import com.example.TTS_LibraryManagement.dto.request.Book.ErrorRecordBook;
 import com.example.TTS_LibraryManagement.dto.response.ApiResponse;
 import com.example.TTS_LibraryManagement.dto.response.Book.BookResponse;
+import com.example.TTS_LibraryManagement.dto.response.Book.ImportBooksResult;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +22,6 @@ public interface BookService {
     void restoreBook(Long bookId);
     BookResponse getBookById(Long id);
     Page<BookResponse> getBooksByPage(int page, int size, BookSearchRequest request);
-    ApiResponse<List<ErrorRecordBook>> importBooksFromExcel(MultipartFile file);
+    ImportBooksResult importBooksFromExcel(MultipartFile file);
     void exportBooksToExcel(HttpServletResponse response);
 }

@@ -6,7 +6,7 @@ import com.example.TTS_LibraryManagement.dto.response.Category.CategoryResponse;
 import com.example.TTS_LibraryManagement.dto.response.Dashboard.DashboardBookResponse;
 import com.example.TTS_LibraryManagement.entity.Category;
 import com.example.TTS_LibraryManagement.exception.AppException;
-import com.example.TTS_LibraryManagement.exception.ErrorCode;
+import com.example.TTS_LibraryManagement.enums.ErrorCode;
 import com.example.TTS_LibraryManagement.mapper.CategoryMapper;
 import com.example.TTS_LibraryManagement.repository.CategoryRepo;
 import com.example.TTS_LibraryManagement.service.CategoryService;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service

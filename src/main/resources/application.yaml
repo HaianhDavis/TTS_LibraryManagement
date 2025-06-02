@@ -32,9 +32,9 @@ logging:
     config:
       level: DEBUG
 open:
-    api:
-        title: Library API
-        description: Library API for managing books and authors
-        version: 1.0.0
-        serverUrl: http://localhost:8094/identity/api/v1/library
-        serverName: server test
+  api:
+    title: Library API
+    description: Library API for managing books and authors
+    version: 1.0.0
+    serverUrl: http://localhost:8094/identity/api/v1/library
+    serverName: server test

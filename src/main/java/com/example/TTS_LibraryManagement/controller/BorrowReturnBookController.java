@@ -5,9 +5,11 @@ import com.example.TTS_LibraryManagement.dto.request.BorrowReturnBook.BRBookUpda
 import com.example.TTS_LibraryManagement.dto.response.ApiResponse;
 import com.example.TTS_LibraryManagement.dto.response.BorrowReturnBook.BorrowReturnBookResponse;
 import com.example.TTS_LibraryManagement.service.BorrowReturnBookService;
+import com.example.TTS_LibraryManagement.utils.ApiUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -29,60 +31,44 @@ public class BorrowReturnBookController {
     @Operation(summary = "Create a new Borrow Return Book")
     @PostMapping("/create/{userId}")
     @PreAuthorize("fileRole(#httpServletRequest)")
-    ApiResponse<BorrowReturnBookResponse> createBR(HttpServletRequest httpServletRequest, @PathVariable Long userId, @RequestBody BRBookCreationRequest request) {
-        ApiResponse<BorrowReturnBookResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully created Borrow Return Book");
-        apiResponse.setResult(borrowReturnBookService.createBorrowReturnBook(userId, request));
-        return apiResponse;
+    ApiResponse<BorrowReturnBookResponse> createBR(HttpServletRequest httpServletRequest, @PathVariable Long userId, @RequestBody @Valid BRBookCreationRequest request) {
+        return ApiUtils.success(borrowReturnBookService.createBorrowReturnBook(userId, request));
     }
 
     @Operation(summary = "Get all Borrow Return Books")
     @GetMapping("/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<List<BorrowReturnBookResponse>> getBRByUserId(HttpServletRequest httpServletRequest, @PathVariable Long id) {
-        ApiResponse<List<BorrowReturnBookResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully retrieved Borrow Return Book");
-        apiResponse.setResult(borrowReturnBookService.getBorrowReturnBooksByUserId(id));
-        return apiResponse;
+        return ApiUtils.success(borrowReturnBookService.getBorrowReturnBooksByUserId(id));
     }
 
     @Operation(summary = "Get all Borrow Return Books")
     @GetMapping("/detail/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<BorrowReturnBookResponse> getBRById(HttpServletRequest httpServletRequest, @PathVariable Long id) {
-        ApiResponse<BorrowReturnBookResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully retrieved Borrow Return Book");
-        apiResponse.setResult(borrowReturnBookService.getBorrowReturnBookById(id));
-        return apiResponse;
+        return ApiUtils.success(borrowReturnBookService.getBorrowReturnBookById(id));
     }
 
     @Operation(summary = "Get all Borrow Return Books")
     @PutMapping("/update/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
-    ApiResponse<BorrowReturnBookResponse> updateBR(HttpServletRequest httpServletRequest, @PathVariable Long id, @RequestBody BRBookUpdateRequest request) {
-        ApiResponse<BorrowReturnBookResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully updated Borrow Return Book");
-        apiResponse.setResult(borrowReturnBookService.updateBorrowReturnBook(id, request));
-        return apiResponse;
+    ApiResponse<BorrowReturnBookResponse> updateBR(HttpServletRequest httpServletRequest, @PathVariable Long id, @RequestBody @Valid BRBookUpdateRequest request) {
+        return ApiUtils.success(borrowReturnBookService.updateBorrowReturnBook(id, request));
     }
 
     @Operation(summary = "Delete a Borrow Return Book")
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<BorrowReturnBookResponse> deleteBR(HttpServletRequest httpServletRequest, @PathVariable Long id) {
-        ApiResponse<BorrowReturnBookResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully deleted Borrow Return Book");
         borrowReturnBookService.deleteBorrowReturnBook(id);
-        return apiResponse;
+        return ApiUtils.successDeleteOrRestore("Successfully deleted Borrow Return Book with ID: " + id);
     }
 
     @Operation(summary = "Restore a Borrow Return Book")
     @PatchMapping("/restore/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<BorrowReturnBookResponse> restoreBR(HttpServletRequest httpServletRequest, @PathVariable Long id) {
-        ApiResponse<BorrowReturnBookResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage("Successfully restored Borrow Return Book");
         borrowReturnBookService.restoreBorrowReturnBook(id);
-        return apiResponse;
+        return ApiUtils.successDeleteOrRestore("Successfully restored Borrow Return Book with ID: " + id);
     }
 }
