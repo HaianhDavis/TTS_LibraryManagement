@@ -32,10 +32,10 @@ public class PostController {
     PostService postService;
 
     @Operation(summary = "Create a new post")
-    @PostMapping("/create/{userId}")
+    @PostMapping("/create")
     @PreAuthorize("fileRole(#httpServletRequest)")
-    ApiResponse<PostResponse> createPost(HttpServletRequest httpServletRequest, @PathVariable Long userId, @RequestBody @Valid PostCreationRequest request) {
-        return ApiUtils.success(postService.createPost(userId, request));
+    ApiResponse<PostResponse> createPost(HttpServletRequest httpServletRequest, @RequestBody @Valid PostCreationRequest request) {
+        return ApiUtils.success(postService.createPost(request));
     }
 
     @Operation(summary = "Get all posts")
@@ -52,7 +52,7 @@ public class PostController {
         return ApiUtils.success(postService.getPost(id));
     }
 
-    @Operation(summary = "Search posts by title")
+    @Operation(summary = "Update a post")
     @PutMapping("/update/{id}")
     @PreAuthorize("fileRole(#httpServletRequest)")
     ApiResponse<PostResponse> updatePost(HttpServletRequest httpServletRequest, @PathVariable Long id, @RequestBody @Valid PostUpdateRequest request) {

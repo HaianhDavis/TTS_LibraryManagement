@@ -30,10 +30,13 @@ public interface PostRepo extends JpaRepository<Post, Long> {
     @Query("select count(pl) from PostLike pl where pl.post.id = ?1 and pl.isLike = true and pl.isDeleted = 0")
     int findTotalLikesByPostId(Long postId);
 
-   @Query("select p.id, p.title, count(pl) " +
-          "from Post p left join PostLike pl on pl.post.id = p.id and pl.isLike = true and pl.isDeleted = 0 " +
-          "where p.isDeleted = 0 " +
-          "group by p.id, p.title " +
-          "order by count(pl) desc")
-   List<Object[]> getListTopLiked(Pageable pageable);
+    @Query("select p.id, p.title, count(pl) " +
+            "from Post p left join PostLike pl on pl.post.id = p.id and pl.isLike = true and pl.isDeleted = 0 " +
+            "where p.isDeleted = 0 " +
+            "group by p.id, p.title " +
+            "order by count(pl) desc")
+    List<Object[]> getListTopLiked(Pageable pageable);
+
+    @Query(value = "select case when count(p) > 0 then true else false end from Post p where p.id = ?1 and p.user.username = ?2 and p.isDeleted = 0")
+    boolean checkPostExistsByIdAndUser(Long id, String username);
 }

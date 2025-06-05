@@ -15,7 +15,7 @@ import java.sql.Timestamp;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ToString
 public class PostCreationRequest {
-    @NotBlank(message = "NOT_BLANK")
+    Long userId;
     Long bookId;
     @NotBlank(message = "NOT_BLANK")
     String title;

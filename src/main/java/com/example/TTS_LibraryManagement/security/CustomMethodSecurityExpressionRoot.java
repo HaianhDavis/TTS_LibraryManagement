@@ -62,9 +62,20 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
                 uri = uri.substring(contextPath.length());
             }
             uri = uri.replaceAll("^/+", "").replaceAll("/+$", "");
-            uri = uri.replace("/", ".");
 
-            String normalizedUri = "api.v1.library." + uri;
+            // Tách URI để loại bỏ các tham số động (như ID)
+            String[] uriParts = uri.split("/");
+            StringBuilder staticPath = new StringBuilder();
+            for (String part : uriParts) {
+                // Bỏ qua các phần có vẻ là tham số động (ví dụ: số, UUID, v.v.)
+                if (!part.matches("\\d+|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")) {
+                    if (staticPath.length() > 0) {
+                        staticPath.append(".");
+                    }
+                    staticPath.append(part);
+                }
+            }
+            String normalizedUri = "api.v1.library." + staticPath.toString();
             log.debug("Normalized URI: {}", normalizedUri);
 
             String requiredPermission = roleProperties.getProperty(normalizedUri);
@@ -85,7 +96,6 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
             return false;
         }
     }
-
 
     @Override
     public Object getThis() {

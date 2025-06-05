@@ -29,7 +29,6 @@ public class PostResponse {
     Timestamp updatedAt;
     String createdBy;
     String updatedBy;
-    int isDeleted;
     Timestamp deletedAt;
     String deletedBy;
 }

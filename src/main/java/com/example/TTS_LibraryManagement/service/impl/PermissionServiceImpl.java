@@ -39,7 +39,6 @@ public class PermissionServiceImpl implements PermissionService {
     PermissionMapper permissionMapper;
 
     @Transactional
-//    @PreAuthorize("hasRole('ADMIN')")
     public PermissionResponse createPermission(PermissionCreationRequest request){
         if(permissionRepo.existsByFunctionCode(request.getFunctionCode())){
             throw new AppException(ErrorCode.PERMISSION_EXISTED);
@@ -51,7 +50,6 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
     public PermissionResponse updatePermission(Long id, PermissionUpdateRequest request){
         Permission permission = permissionRepo
                 .findPermissionByIdAndIsDeletedFalse(id).orElseThrow(() -> new AppException(ErrorCode.PERMISSION_NOT_FOUND));

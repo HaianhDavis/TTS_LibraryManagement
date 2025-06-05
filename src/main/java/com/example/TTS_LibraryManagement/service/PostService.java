@@ -12,7 +12,7 @@ import java.util.List;
 public interface PostService {
     List<PostResponse> getPosts();
     PostResponse getPost(Long id);
-    PostResponse createPost(Long userId, PostCreationRequest request);
+    PostResponse createPost(PostCreationRequest request);
     PostResponse updatePost(Long id, PostUpdateRequest request);
     void deletePost(Long id);
     void restorePost(Long id);

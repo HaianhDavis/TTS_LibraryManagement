@@ -17,6 +17,7 @@ import com.example.TTS_LibraryManagement.repository.BookRepo;
 import com.example.TTS_LibraryManagement.repository.PostLikeRepo;
 import com.example.TTS_LibraryManagement.repository.PostRepo;
 import com.example.TTS_LibraryManagement.repository.UserRepo;
+import com.example.TTS_LibraryManagement.service.AuthenticationService;
 import com.example.TTS_LibraryManagement.service.PostService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -25,6 +26,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -46,6 +48,8 @@ public class PostServiceImpl implements PostService {
     BookRepo bookRepo;
 
     PostLikeRepo postLikeRepo;
+
+    AuthenticationService authenticationService;
 
     @Transactional
     public List<PostResponse> getPosts() {
@@ -76,8 +80,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Transactional
-    public PostResponse createPost(Long userId, PostCreationRequest request) {
-        User user = userRepo.findUserByIdAndIsDeletedFalse(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    public PostResponse createPost(PostCreationRequest request) {
+        User user = userRepo.findUserByIdAndIsDeletedFalse(request.getUserId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         Book book = bookRepo.findBookByIdAndIsDeletedFalse(request.getBookId()).orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_FOUND));
         Post post = postMapper.toPostCreate(request);
         post.setUser(user);
@@ -93,6 +97,9 @@ public class PostServiceImpl implements PostService {
 
     @Transactional
     public PostResponse updatePost(Long id, PostUpdateRequest request) {
+        if(!postRepo.checkPostExistsByIdAndUser(id, SecurityContextHolder.getContext().getAuthentication().getName())) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
         Post post = postRepo.findByPostId(id).orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND));
         if (request.getTitle().equals(post.getTitle()) && request.getContent().equals(post.getContent())) {
             throw new AppException(ErrorCode.POST_NOT_CHANGED);
